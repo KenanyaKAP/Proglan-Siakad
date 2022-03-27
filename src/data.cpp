@@ -6,13 +6,15 @@
 #include "include/data.hpp"
 #include "include/user.hpp"
 
+#define USERPATH "data/user.bin"
+
 using namespace std;
 
 // Constructor
 
 Data::Data()
 {
-    // fUser.open("data/user.bin", ios::in | ios::out | ios::binary);
+    // fUser.openUSERPATH, ios::in | ios::out | ios::binary);
     // if (fUser.is_open())
     // {
     //     bFUser = fUser.is_open();
@@ -20,14 +22,13 @@ Data::Data()
     // else
     // {
     //     fUser.close();
-    //     fUser.open("data/user.bin", ios::trunc | ios::in | ios::out | ios::binary);
+    //     fUser.openUSERPATH, ios::trunc | ios::in | ios::out | ios::binary);
     //     bFUser = fUser.is_open();
     // }
     // if (!bFUser){ cout << "Error while opening departemen.bin!" << endl; return; }
     
     // // Load Recorded Data
-    recUser = loadData<User>(fUser, "data/user.bin");
-    // cout << "Success load User Data!" << endl;
+    OpenData<User>(recUser, fUser, USERPATH);
 }
 
 // Destructor
@@ -44,15 +45,7 @@ int Data::getUserSize(){ return this->recUser.size(); }
 
 vector<User>* Data::getAllUser(){ return &this->recUser; }
 
-void Data::addUser(char username[], char password[], char personId[], User::Role role)
-{
-    User newUser{username, password, personId, role};
-    recUser.push_back(newUser);
-
-    // writeData<User>(fUser, getDataSize<User>(fUser), newUser);
-}
-
-User* Data::getUser(char username[])
+User* Data::getUser(char* username)
 { 
     for (User& user : recUser)
         if (strcmp(user.getUsername(), username) == 0) 
@@ -60,11 +53,30 @@ User* Data::getUser(char username[])
     return nullptr; 
 }
 
-void Data::removeUser(char username[])
+void Data::removeUser(char* username)
 {
-    for (unsigned int i = 0; i < recUser.size(); i++)
+    for (size_t i = 0; i < recUser.size(); i++)
         if (strcmp(recUser[i].getUsername(), username) == 0)
-            recUser.erase(recUser.begin()+i);
+            recUser.erase(recUser.begin() + i);
+
+    fUser.close();
+    fUser.open(USERPATH, ios::trunc | ios::in | ios::out | ios::binary);
+    
+    for (size_t i = 0; i < recUser.size(); i++)
+        writeData<User>(fUser, i, recUser[i]);
+}
+
+void Data::addUser(const char* username, const char* password, const char* personId, User::Role role)
+{
+    addUser((char*)username, (char*)password, (char*)personId, role);
+}
+
+void Data::addUser(char* username, char* password, char* personId, User::Role role)
+{
+    User newUser(username, password, personId, role);
+    recUser.push_back(newUser);
+    
+    writeData<User>(fUser, getDataSize<User>(fUser), newUser);
 }
 
 // Private function
@@ -79,24 +91,27 @@ int Data::getDataSize(fstream& dataFile)
     end = dataFile.tellg();
     return (end - start)/sizeof(T);
 }
+
 template <class T>
 void Data::writeData(fstream &dataFile, int position, T input)
 {
     dataFile.seekp(position * sizeof(T), ios::beg);
-    dataFile.write((char*)&input, sizeof(T));
+    dataFile.write(reinterpret_cast<char*>(&input), sizeof(T));
 }
+
 template <class T>
 T Data::readData(fstream& dataFile, int position)
 {
     T output;
     dataFile.seekg(position * sizeof(T), ios::beg);
-    dataFile.read((char*)&output, sizeof(T));
+    dataFile.read(reinterpret_cast<char*>(&output), sizeof(T));
     return output;
 }
+
 template <class T>
-vector<T> Data::loadData(fstream& dataFile, const char filePath[])
+void Data::OpenData(vector<T>& outRecData, fstream& dataFile, const char* filePath)
 {
-    dataFile.open("data/user.bin", ios::in | ios::out | ios::binary);
+    dataFile.open(filePath, ios::in | ios::out | ios::binary);
     bool bDataFile;
     if (dataFile.is_open())
     {
@@ -105,15 +120,15 @@ vector<T> Data::loadData(fstream& dataFile, const char filePath[])
     else
     {
         dataFile.close();
-        dataFile.open("data/user.bin", ios::trunc | ios::in | ios::out | ios::binary);
+        dataFile.open(filePath, ios::trunc | ios::in | ios::out | ios::binary);
         bDataFile = dataFile.is_open();
     }
     if (!bDataFile){ cout << "Error while opening " << filePath << "!" << endl; exit(1); }
 
-    vector<T> recData;
     for (int i = 0; i < getDataSize<T>(dataFile); i++)
     {
-        recData.push_back(readData<T>(dataFile, i));
+        outRecData.push_back(readData<T>(dataFile, i));
     }
-    return recData;
+
+    cout << "Success load data from " << filePath << "!" << endl;
 }

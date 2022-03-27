@@ -45,13 +45,18 @@ int main()
 	// 	// }
 	// 	cin.ignore();
 	// }
+	// char s1[] = "admin1";
+	// char s2[] = "Admin1";
+	// char s3[] = "adminId";
+	// data.addUser(s1, s2, s3, User::Role::Admin);
 
-	// char s1[] = "5024211004";
-	// char s2[] = "myITSKen73";
-	// char s3[] = "p_1";
-	// data.addUser(s1, s2, s3, User::Role::Mahasiswa);
+	// data.addUser("admin", "Admin", "adminId", User::Role::Admin);
+	// data.addUser("admin2", "Admin2", "adminId", User::Role::Admin);
+	// data.addUser("admin3", "Admin3", "adminId", User::Role::Admin);
+	// data.addUser("admin4", "Admin4", "adminId", User::Role::Admin);
+	// data.addUser("admin5", "Admin5", "adminId", User::Role::Admin);
 
-	// data.removeUser((char*)"toto");
+	// data.removeUser((char*)"admin1");
 
 	vector<User>* users = data.getAllUser();
 
@@ -63,5 +68,6 @@ int main()
 		cout << toto.getRole() << endl;
 	}
 
+	cout << "Done";
 	return 0;
 }

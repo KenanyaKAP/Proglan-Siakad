@@ -21,13 +21,13 @@ private:
 
 public:
     User();
-    User(const char username[], const char password[], const char personId[], Role role);
-    User(char username[], char password[], char personId[], Role role);
+    User(const char* username, const char* password, const char* personId, Role role);
+    User(char* username, char* password, char* personId, Role role);
     char* getUsername();
     char* getPassword();
     char* getPersonId();
     Role getRole();
-    void changePassword(char newPassword[]);
+    void changePassword(char* newPassword);
 };
 
 #endif
