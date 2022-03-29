@@ -15,9 +15,9 @@ private:
     template <class T>
     int getDataSize(std::fstream& dataFile);
     template <class T>
-    void writeData(std::fstream& dataFile, int position, T input);
+    void writeData(std::fstream& dataFile, int position, T input, const char *filePath);
     template <class T>
-    T readData(std::fstream& dataFile, int position);
+    T readData(std::fstream& dataFile, int position, const char *filePath);
     template <class T>
     void OpenData(std::vector<T>& outRecData, std::fstream& dataFile, const char *filePath);
     

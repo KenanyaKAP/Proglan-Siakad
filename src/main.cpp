@@ -15,6 +15,8 @@ int main()
 {
 	Data data;
 
+	cin.ignore();
+
 	// data.addUser("admin", "Admin", "adminId", User::Role::Admin);
 
 	string usernameInput;

@@ -18,7 +18,25 @@ Data::Data()
 {
 
     // // Load Recorded Data
-    OpenData<User>(recUser, fUser, USERPATH);
+    // OpenData<User>(recUser, fUser, USERPATH);
+
+
+    fstream fSuser;
+
+    User tata("ah", "mbho", "pid", User::Role::Dosen);
+
+    S_User sUser(tata);
+
+    writeData<S_User>(fSuser, 0, sUser, "data/fuser.bin");
+    
+    S_User toto = readData<S_User>(fUser, 0, "data/fuser.bin");
+    
+    User done(toto);
+    
+    cout << done.getUsername() << "|";
+    cout << done.getPassword() << "|";
+    cout << done.getPersonId() << "|";
+    cout << done.getRole() << "YESSSSSSSSs" << endl;
 }
 
 // Destructor
@@ -42,18 +60,63 @@ int Data::getDataSize(fstream& dataFile)
 }
 
 template <class T>
-void Data::writeData(fstream &dataFile, int position, T input)
+void Data::writeData(fstream &dataFile, int position, T input, const char *filePath)
 {
+    dataFile.open(filePath, ios::out | ios::in | ios::binary);
+    bool bDataFile;
+    if (dataFile.is_open())
+    {
+        bDataFile = dataFile.is_open();
+    }
+    else
+    {
+        dataFile.close();
+        dataFile.open(filePath, ios::trunc | ios::out | ios::in | ios::binary);
+        bDataFile = dataFile.is_open();
+    }
+    if (!bDataFile){ cout << "Error while opening " << filePath << "!" << endl; exit(1); }
+
+
+
+
+
+
+
     dataFile.seekp(position * sizeof(T), ios::beg);
     dataFile.write(reinterpret_cast<char*>(&input), sizeof(T));
+
+    dataFile.close();
 }
 
 template <class T>
-T Data::readData(fstream& dataFile, int position)
+T Data::readData(fstream& dataFile, int position, const char *filePath)
 {
+    dataFile.open(filePath, ios::out | ios::in | ios::binary);
+    bool bDataFile;
+    if (dataFile.is_open())
+    {
+        bDataFile = dataFile.is_open();
+    }
+    else
+    {
+        dataFile.close();
+        dataFile.open(filePath, ios::trunc | ios::out | ios::in | ios::binary);
+        bDataFile = dataFile.is_open();
+    }
+    if (!bDataFile){ cout << "Error while opening " << filePath << "!" << endl; exit(1); }
+
+
+
+
+
+
+
     T output;
     dataFile.seekg(position * sizeof(T), ios::beg);
     dataFile.read(reinterpret_cast<char*>(&output), sizeof(T));
+
+    dataFile.close();
+
     return output;
 }
 
@@ -105,8 +168,8 @@ void Data::removeUser(char *username)
     fUser.close();
     fUser.open(USERPATH, ios::trunc | ios::in | ios::out | ios::binary);
     
-    for (size_t i = 0; i < recUser.size(); i++)
-        writeData<User>(fUser, i, recUser[i]);
+    // for (size_t i = 0; i < recUser.size(); i++)
+        // writeData<User>(fUser, i, recUser[i]);
 }
 
 void Data::addUser(const char *username, const char *password, const char *personId, User::Role role)
@@ -119,7 +182,7 @@ void Data::addUser(char *username, char *password, char *personId, User::Role ro
     User newUser(username, password, personId, role);
     recUser.push_back(newUser);
     
-    writeData<User>(fUser, getDataSize<User>(fUser), newUser);
+    // writeData<User>(fUser, getDataSize<User>(fUser), newUser);
 }
 
 int Data::loginUser(char *username, char *password)

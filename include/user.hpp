@@ -2,6 +2,7 @@
 #define __USER_HPP__
 
 #include <iostream>
+#include <cstring>
 
 class User {
 public:
@@ -22,12 +23,25 @@ private:
 public:
     User();
     // User(const std::string username, const std::string password, const std::string personId, Role role);
+    User(class S_User sUser);
     User(std::string username, std::string password, std::string personId, Role role);
     std::string getUsername();
     std::string getPassword();
     std::string getPersonId();
     Role getRole();
     void changePassword(std::string newPassword);
+};
+
+class S_User {
+public:
+    char username[20];
+    char password[20];
+    char personId[20];
+    User::Role role;
+
+    S_User();
+    S_User(User user);
+    S_User(const char *username, const char *password, const char *personId, User::Role role);
 };
 
 #endif
