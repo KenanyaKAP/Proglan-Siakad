@@ -91,7 +91,7 @@ vector<User> *Data::getAllUser(){ return &this->recUser; }
 User *Data::getUser(char *username)
 { 
     for (User& user : recUser)
-        if (strcmp(user.getUsername(), username) == 0) 
+        if (strcmp(user.getUsername().c_str(), username) == 0) 
             return &user; 
     return nullptr; 
 }
@@ -99,7 +99,7 @@ User *Data::getUser(char *username)
 void Data::removeUser(char *username)
 {
     for (size_t i = 0; i < recUser.size(); i++)
-        if (strcmp(recUser[i].getUsername(), username) == 0)
+        if (strcmp(recUser[i].getUsername().c_str(), username) == 0)
             recUser.erase(recUser.begin() + i);
 
     fUser.close();
@@ -126,7 +126,7 @@ int Data::loginUser(char *username, char *password)
 {
     for (User &user : recUser)
     {
-        if (strcmp(username, user.getUsername()) == 0 && strcmp(password, user.getPassword()) == 0)
+        if (strcmp(username, user.getUsername().c_str()) == 0 && strcmp(password, user.getPassword().c_str()) == 0)
             return user.getRole();
     }
     return -1;

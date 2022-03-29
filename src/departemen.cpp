@@ -19,5 +19,5 @@ char *Departemen::getName(){ return this->name; }
 
 void Departemen::addDosen(char *id)
 {
-    dosenIds.push_back(id);
+    // dosenIds.push_back(id);
 }

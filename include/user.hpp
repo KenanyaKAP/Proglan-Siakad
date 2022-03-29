@@ -14,20 +14,20 @@ public:
     };
 
 private:
-    char username[20];
-    char password[20];
-    char personId[20];
+    std::string username;
+    std::string password;
+    std::string personId;
     Role role;
 
 public:
     User();
-    User(const char* username, const char* password, const char* personId, Role role);
-    User(char* username, char* password, char* personId, Role role);
-    char* getUsername();
-    char* getPassword();
-    char* getPersonId();
+    // User(const std::string username, const std::string password, const std::string personId, Role role);
+    User(std::string username, std::string password, std::string personId, Role role);
+    std::string getUsername();
+    std::string getPassword();
+    std::string getPersonId();
     Role getRole();
-    void changePassword(char* newPassword);
+    void changePassword(std::string newPassword);
 };
 
 #endif
