@@ -13,19 +13,15 @@ private:
 
     template <class T>
     int getDataSize(std::fstream& dataFile);
-    template <class T>
-    void writeData(std::fstream& dataFile, int position, T input, const char *filePath);
+    template <class Base, class Save>
+    void writeData(int position, Base input, const char *filePath);
     template <class T>
     T readData(std::fstream& dataFile, int position);
-    // template <class T>
-    // void OpenData(std::vector<T>& outRecData, std::fstream& dataFile, const char *filePath);
     template <class Base, class Save>
-    std::vector<Base> loadData(std::fstream& dataFile, const char *filePath);
-    
+    std::vector<Base> loadData(const char *filePath);
 
 public:
     Data();
-    ~Data();
 
     int getUserSize();
     std::vector<User> *getAllUser();

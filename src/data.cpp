@@ -20,30 +20,29 @@ Data::Data()
     // // Load Recorded Data
     // OpenData<User>(recUser, fUser, USERPATH);
 
+    User tata("Yose", "osee!234", "p_6", User::Role::Mahasiswa);
 
-    fstream fSuser;
+    // S_User sUser(tata);
 
-    User tata("Ken", "Ken!234", "p_0", User::Role::Mahasiswa);
-
-    S_User sUser(tata);
-
-    writeData<S_User>(fSuser, 1, sUser, "data/fuser.bin");
+    // writeData<S_User>(1, sUser, "data/fuser.bin");
     
-    // S_User toto = readData<S_User>(fUser, 0, "data/fuser.bin");
+    // // S_User toto = readData<S_User>(fUser, 0, "data/fuser.bin");
     
-    vector<User> users = loadData<User, S_User>(fSuser, "data/fuser.bin");
+    // vector<User> users = loadData<User, S_User>("data/fuser.bin");
     
-    cout << users[1].getUsername() << "|";
-    cout << users[1].getPassword() << "|";
-    cout << users[1].getPersonId() << "|";
-    cout << users[1].getRole() << "|YESSSSSSSSs" << endl;
-}
-
-// Destructor
-
-Data::~Data()
-{
-    // fUser.close();
+    // cout << users[1].getUsername() << "|";
+    // cout << users[1].getPassword() << "|";
+    // cout << users[1].getPersonId() << "|";
+    // cout << users[1].getRole() << "|YESSSSSSSSs" << endl;
+    writeData<User, S_User>(5, tata, USERPATH);
+    recUser = loadData<User, S_User>(USERPATH);
+    for (User user : recUser)
+    {
+        cout << user.getUsername() << "|";
+        cout << user.getPassword() << "|";
+        cout << user.getPersonId() << "|";
+        cout << user.getRole() << endl;
+    }
 }
 
 // Private function
@@ -59,31 +58,24 @@ int Data::getDataSize(fstream& dataFile)
     return (end - start)/sizeof(T);
 }
 
-template <class T>
-void Data::writeData(fstream &dataFile, int position, T input, const char *filePath)
+template <class Base, class Save>
+void Data::writeData(int position, Base input, const char *filePath)
 {
+    fstream dataFile;
     dataFile.open(filePath, ios::out | ios::in | ios::binary);
-    bool bDataFile;
-    if (dataFile.is_open())
-    {
-        bDataFile = dataFile.is_open();
-    }
-    else
-    {
-        dataFile.close();
-        dataFile.open(filePath, ios::trunc | ios::out | ios::in | ios::binary);
-        bDataFile = dataFile.is_open();
-    }
+    bool bDataFile = dataFile.is_open();
     if (!bDataFile){ cout << "Error while opening " << filePath << "!" << endl; exit(1); }
 
+    // User tata("Ken", "Ken!234", "p_0", User::Role::Mahasiswa);
+
+    // S_User sUser(tata);
+
+    // writeData<S_User>(1, sUser, "data/fuser.bin");
+    Save save(input);
 
 
-
-
-
-
-    dataFile.seekp(position * sizeof(T), ios::beg);
-    dataFile.write(reinterpret_cast<char*>(&input), sizeof(T));
+    dataFile.seekp(position * sizeof(Save), ios::beg);
+    dataFile.write(reinterpret_cast<char*>(&save), sizeof(Save));
 
     dataFile.close();
 }
@@ -98,34 +90,10 @@ T Data::readData(fstream& dataFile, int position)
     return output;
 }
 
-// template <class T>
-// void Data::OpenData(vector<T>& outRecData, fstream& dataFile, const char *filePath)
-// {
-//     dataFile.open(filePath, ios::out | ios::in | ios::binary);
-//     bool bDataFile;
-//     if (dataFile.is_open())
-//     {
-//         bDataFile = dataFile.is_open();
-//     }
-//     else
-//     {
-//         dataFile.close();
-//         dataFile.open(filePath, ios::trunc | ios::out | ios::in | ios::binary);
-//         bDataFile = dataFile.is_open();
-//     }
-//     if (!bDataFile){ cout << "Error while opening " << filePath << "!" << endl; exit(1); }
-
-//     for (int i = 0; i < getDataSize<T>(dataFile); i++)
-//     {
-//         outRecData.push_back(readData<T>(dataFile, i));
-//     }
-
-//     cout << "Success load data from " << filePath << "!" << endl;
-// }
-
 template <class Base, class Save>
-vector<Base> Data::loadData(std::fstream& dataFile, const char *filePath)
+vector<Base> Data::loadData(const char *filePath)
 {
+    fstream dataFile;
     dataFile.open(filePath, ios::in | ios::binary);
     bool bDataFile;
     if (dataFile.is_open())
@@ -135,7 +103,7 @@ vector<Base> Data::loadData(std::fstream& dataFile, const char *filePath)
     else
     {
         dataFile.close();
-        dataFile.open(filePath, ios::trunc | ios::in | ios::binary);
+        dataFile.open(filePath, ios::trunc | ios::out | ios::in | ios::binary);
         bDataFile = dataFile.is_open();
     }
     if (!bDataFile){ cout << "Error while opening " << filePath << "!" << endl; exit(1); }
