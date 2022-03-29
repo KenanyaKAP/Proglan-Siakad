@@ -5,8 +5,10 @@
 
 #include "include/data.hpp"
 #include "include/user.hpp"
+#include "include/departemen.hpp"
 
 #define USERPATH "data/user.bin"
+#define DEPARTEMENPATH "data/departemen.bin"
 
 using namespace std;
 
@@ -14,19 +16,7 @@ using namespace std;
 
 Data::Data()
 {
-    // fUser.openUSERPATH, ios::in | ios::out | ios::binary);
-    // if (fUser.is_open())
-    // {
-    //     bFUser = fUser.is_open();
-    // }
-    // else
-    // {
-    //     fUser.close();
-    //     fUser.openUSERPATH, ios::trunc | ios::in | ios::out | ios::binary);
-    //     bFUser = fUser.is_open();
-    // }
-    // if (!bFUser){ cout << "Error while opening departemen.bin!" << endl; return; }
-    
+
     // // Load Recorded Data
     OpenData<User>(recUser, fUser, USERPATH);
 }
@@ -36,47 +26,6 @@ Data::Data()
 Data::~Data()
 {
     fUser.close();
-}
-
-
-// User
-
-int Data::getUserSize(){ return this->recUser.size(); }
-
-vector<User>* Data::getAllUser(){ return &this->recUser; }
-
-User* Data::getUser(char* username)
-{ 
-    for (User& user : recUser)
-        if (strcmp(user.getUsername(), username) == 0) 
-            return &user; 
-    return nullptr; 
-}
-
-void Data::removeUser(char* username)
-{
-    for (size_t i = 0; i < recUser.size(); i++)
-        if (strcmp(recUser[i].getUsername(), username) == 0)
-            recUser.erase(recUser.begin() + i);
-
-    fUser.close();
-    fUser.open(USERPATH, ios::trunc | ios::in | ios::out | ios::binary);
-    
-    for (size_t i = 0; i < recUser.size(); i++)
-        writeData<User>(fUser, i, recUser[i]);
-}
-
-void Data::addUser(const char* username, const char* password, const char* personId, User::Role role)
-{
-    addUser((char*)username, (char*)password, (char*)personId, role);
-}
-
-void Data::addUser(char* username, char* password, char* personId, User::Role role)
-{
-    User newUser(username, password, personId, role);
-    recUser.push_back(newUser);
-    
-    writeData<User>(fUser, getDataSize<User>(fUser), newUser);
 }
 
 // Private function
@@ -109,9 +58,9 @@ T Data::readData(fstream& dataFile, int position)
 }
 
 template <class T>
-void Data::OpenData(vector<T>& outRecData, fstream& dataFile, const char* filePath)
+void Data::OpenData(vector<T>& outRecData, fstream& dataFile, const char *filePath)
 {
-    dataFile.open(filePath, ios::in | ios::out | ios::binary);
+    dataFile.open(filePath, ios::out | ios::in | ios::binary);
     bool bDataFile;
     if (dataFile.is_open())
     {
@@ -120,7 +69,7 @@ void Data::OpenData(vector<T>& outRecData, fstream& dataFile, const char* filePa
     else
     {
         dataFile.close();
-        dataFile.open(filePath, ios::trunc | ios::in | ios::out | ios::binary);
+        dataFile.open(filePath, ios::trunc | ios::out | ios::in | ios::binary);
         bDataFile = dataFile.is_open();
     }
     if (!bDataFile){ cout << "Error while opening " << filePath << "!" << endl; exit(1); }
@@ -131,4 +80,54 @@ void Data::OpenData(vector<T>& outRecData, fstream& dataFile, const char* filePa
     }
 
     cout << "Success load data from " << filePath << "!" << endl;
+}
+
+// User
+
+int Data::getUserSize(){ return this->recUser.size(); }
+
+vector<User> *Data::getAllUser(){ return &this->recUser; }
+
+User *Data::getUser(char *username)
+{ 
+    for (User& user : recUser)
+        if (strcmp(user.getUsername(), username) == 0) 
+            return &user; 
+    return nullptr; 
+}
+
+void Data::removeUser(char *username)
+{
+    for (size_t i = 0; i < recUser.size(); i++)
+        if (strcmp(recUser[i].getUsername(), username) == 0)
+            recUser.erase(recUser.begin() + i);
+
+    fUser.close();
+    fUser.open(USERPATH, ios::trunc | ios::in | ios::out | ios::binary);
+    
+    for (size_t i = 0; i < recUser.size(); i++)
+        writeData<User>(fUser, i, recUser[i]);
+}
+
+void Data::addUser(const char *username, const char *password, const char *personId, User::Role role)
+{
+    addUser((char*)username, (char*)password, (char*)personId, role);
+}
+
+void Data::addUser(char *username, char *password, char *personId, User::Role role)
+{
+    User newUser(username, password, personId, role);
+    recUser.push_back(newUser);
+    
+    writeData<User>(fUser, getDataSize<User>(fUser), newUser);
+}
+
+int Data::loginUser(char *username, char *password)
+{
+    for (User &user : recUser)
+    {
+        if (strcmp(username, user.getUsername()) == 0 && strcmp(password, user.getPassword()) == 0)
+            return user.getRole();
+    }
+    return -1;
 }

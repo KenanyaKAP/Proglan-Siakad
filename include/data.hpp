@@ -19,7 +19,7 @@ private:
     template <class T>
     T readData(std::fstream& dataFile, int position);
     template <class T>
-    void OpenData(std::vector<T>& outRecData, std::fstream& dataFile, const char* filePath);
+    void OpenData(std::vector<T>& outRecData, std::fstream& dataFile, const char *filePath);
     
 
 public:
@@ -27,11 +27,15 @@ public:
     ~Data();
 
     int getUserSize();
-    std::vector<User>* getAllUser();
-    User* getUser(char* username);
-    void removeUser(char* username);
-    void addUser(const char* username, const char* password, const char* personId, User::Role role);
-    void addUser(char* username, char* password, char* personId, User::Role role);
+    std::vector<User> *getAllUser();
+    User *getUser(char *username);
+    void removeUser(char *username);
+    void addUser(const char *username, const char *password, const char *personId, User::Role role);
+    void addUser(char *username, char *password, char *personId, User::Role role);
+    int loginUser(char *username, char *password);
+
+    void checkUname(char *uname);
+
 };
 
 #endif
