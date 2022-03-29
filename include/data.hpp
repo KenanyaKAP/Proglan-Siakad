@@ -9,7 +9,6 @@
 
 struct Data {
 private:
-    std::fstream fUser;
     std::vector<User> recUser;
 
     template <class T>
@@ -17,9 +16,11 @@ private:
     template <class T>
     void writeData(std::fstream& dataFile, int position, T input, const char *filePath);
     template <class T>
-    T readData(std::fstream& dataFile, int position, const char *filePath);
-    template <class T>
-    void OpenData(std::vector<T>& outRecData, std::fstream& dataFile, const char *filePath);
+    T readData(std::fstream& dataFile, int position);
+    // template <class T>
+    // void OpenData(std::vector<T>& outRecData, std::fstream& dataFile, const char *filePath);
+    template <class Base, class Save>
+    Base loadData(std::fstream& dataFile, const char *filePath);
     
 
 public:
