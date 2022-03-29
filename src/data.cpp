@@ -31,12 +31,12 @@ Data::Data()
     
     // S_User toto = readData<S_User>(fUser, 0, "data/fuser.bin");
     
-    User done(loadData<User, S_User>(fSuser, "data/fuser.bin"));
+    vector<User> users = loadData<User, S_User>(fSuser, "data/fuser.bin");
     
-    cout << done.getUsername() << "|";
-    cout << done.getPassword() << "|";
-    cout << done.getPersonId() << "|";
-    cout << done.getRole() << "|YESSSSSSSSs" << endl;
+    cout << users[1].getUsername() << "|";
+    cout << users[1].getPassword() << "|";
+    cout << users[1].getPersonId() << "|";
+    cout << users[1].getRole() << "|YESSSSSSSSs" << endl;
 }
 
 // Destructor
@@ -124,7 +124,7 @@ T Data::readData(fstream& dataFile, int position)
 // }
 
 template <class Base, class Save>
-Base Data::loadData(std::fstream& dataFile, const char *filePath)
+vector<Base> Data::loadData(std::fstream& dataFile, const char *filePath)
 {
     dataFile.open(filePath, ios::in | ios::binary);
     bool bDataFile;
@@ -140,9 +140,15 @@ Base Data::loadData(std::fstream& dataFile, const char *filePath)
     }
     if (!bDataFile){ cout << "Error while opening " << filePath << "!" << endl; exit(1); }
 
-    Save save = readData<Save>(dataFile, 1);
-    Base base(save);
-    return base;
+    vector<Base> data;
+    for (int i = 0; i < getDataSize<Save>(dataFile); i++)
+    {
+        Save save = readData<Save>(dataFile, i);
+        Base base(save);
+        data.push_back(base);
+    }
+
+    return data;
 }
 
 // User

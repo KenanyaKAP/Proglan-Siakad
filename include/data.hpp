@@ -20,7 +20,7 @@ private:
     // template <class T>
     // void OpenData(std::vector<T>& outRecData, std::fstream& dataFile, const char *filePath);
     template <class Base, class Save>
-    Base loadData(std::fstream& dataFile, const char *filePath);
+    std::vector<Base> loadData(std::fstream& dataFile, const char *filePath);
     
 
 public:
