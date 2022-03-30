@@ -6,18 +6,18 @@
 
 class Departemen {
 private:
-    char id[20];
-    char name[100];
+    std::string id;
+    std::string name;
 
-    std::vector<char*> dosenIds;
+    std::vector<std::string> dosenIds;
 
 public:
-    Departemen(char *id, char *name);
+    Departemen();
+    Departemen(std::string id, std::string name);
 
-    char *getId();
-    char *getName();
-
-    void addDosen(char *id);
+    std::string getId();
+    std::string getName();
+    void addDosen(std::string id);
 };
 
 #endif

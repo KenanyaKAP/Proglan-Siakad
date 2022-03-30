@@ -5,20 +5,33 @@
 
 using namespace std;
 
-Departemen::Departemen(char *id, char *name)
+// ========================== Constructor ===========================
+Departemen::Departemen(){}
+
+Departemen::Departemen(string id, string name)
+    :id(id), name(name){}
+// ==================================================================
+
+
+
+// ======================== Private Function ========================
+// ==================================================================
+
+
+
+// ======================== Public Function =========================
+string Departemen::getId(){ return this->id; }
+
+string Departemen::getName(){ return this->name; }
+
+void Departemen::addDosen(string id)
 {
-    strcpy(this->id, id);
-	this->id[sizeof(this->id) - 1] = '\0';
-    strcpy(this->name, name);
-	this->name[sizeof(this->name) - 1] = '\0';
-}
-
-char *Departemen::getId(){ return this->id; }
-
-char *Departemen::getName(){ return this->name; }
-
-void Departemen::addDosen(char *id)
-{
-    id[19] = '\0';
     dosenIds.push_back(id);
 }
+// ==================================================================
+
+
+
+// ====================== Class for Save User =======================
+// ==================================================================
+

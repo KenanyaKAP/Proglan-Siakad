@@ -18,13 +18,14 @@ void clearScreen()
 template <class... T>
 void printTable(vector<tuple<T...>> data, vector<string> header, unsigned int page)
 {
-    tuple<T...> nullTuple;
-    VariadicTable<T...> vt(header);
-	for (unsigned int i = 10*(page-1); i < 10*page; i++)
+    tuple<int, T...> nullTuple;
+    header.insert(header.begin(), "No");
+    VariadicTable<int, T...> vt(header);
+    for (unsigned int i = 10*(page-1); i < 10*page; i++)
     {
         if (i < data.size())
         {
-            vt.addRow(data[i]);
+            vt.addRow(tuple_cat(make_tuple(i+1), data[i]));
         }
         else
         {

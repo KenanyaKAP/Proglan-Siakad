@@ -12,48 +12,16 @@
 
 using namespace std;
 
-void printUser(vector<User> recUser)
-{
-    cout << "Printing:" << endl;
-    for (User user : recUser)
-    {
-        cout << user.getUsername() << "|";
-        cout << user.getPassword() << "|";
-        cout << user.getPersonId() << "|";
-        cout << user.getRole() << endl;
-    }
-    cout << endl;
-}
-
-// Constructor
-
+// ======================= Constructor ==============================
 Data::Data()
 {
-    loadData();
-}
-
-// Public function
-
-void Data::loadData()
-{
-    // User
     recUser = loadData<User, S_User>(USERPATH);
 }
+// ==================================================================
 
-void Data::updateUser(std::string username)
-{
-    for (unsigned int i = 0; i < recUser.size(); i++)
-    {
-        if (strcmp(recUser[i].getUsername().c_str(), username.c_str()) == 0)
-        {
-            writeData<User, S_User>(i, recUser[i], USERPATH);
-            return;
-        }
-    }
-}
 
-// Private function
 
+// ======================== Private Function ========================
 template <class T>
 int Data::getDataSize(fstream& dataFile)
 {
@@ -117,14 +85,38 @@ vector<Base> Data::loadData(const char *filePath)
         data.push_back(base);
     }
 
+    dataFile.close();
     return data;
 }
+// ==================================================================
 
-// User
 
+
+// ======================== Public Function =========================
+int Data::loginUser(string username, string password)
+{
+    for (User &user : recUser)
+    {
+        if (strcmp(username.c_str(), user.getUsername().c_str()) == 0 && strcmp(password.c_str(), user.getPassword().c_str()) == 0)
+            return user.getRole();
+    }
+    return -1;
+}
+// ==================================================================
+
+
+
+// ==========================    USER    ============================
 int Data::getUserSize(){ return this->recUser.size(); }
 
 vector<User> *Data::getAllUser(){ return &this->recUser; }
+
+User *Data::getUser(int index)
+{
+    if (index >= 0 && index < (int)recUser.size())
+        return &recUser[index];
+    return nullptr;
+}
 
 User *Data::getUser(string username)
 { 
@@ -132,6 +124,38 @@ User *Data::getUser(string username)
         if (strcmp(user.getUsername().c_str(), username.c_str()) == 0) 
             return &user; 
     return nullptr; 
+}
+
+void Data::updateUser(std::string username)
+{
+    for (unsigned int i = 0; i < recUser.size(); i++)
+    {
+        if (strcmp(recUser[i].getUsername().c_str(), username.c_str()) == 0)
+        {
+            writeData<User, S_User>(i, recUser[i], USERPATH);
+            return;
+        }
+    }
+}
+
+void Data::addUser(string username, string password, string personId, User::Role role)
+{
+    User newUser(username, password, personId, role);
+    writeData<User, S_User>(recUser.size(), newUser, USERPATH);
+    recUser = loadData<User, S_User>(USERPATH);
+}
+
+void Data::removeUser(int index)
+{
+    recUser.erase(recUser.begin() + index);
+
+    fstream dataFile;
+    dataFile.open(USERPATH, ios::trunc | ios::out | ios::in | ios::binary);
+    
+    for (size_t i = 0; i < recUser.size(); i++)
+        writeData<User, S_User>(i, recUser[i], USERPATH);
+    
+    dataFile.close();
 }
 
 void Data::removeUser(string username)
@@ -145,21 +169,7 @@ void Data::removeUser(string username)
     
     for (size_t i = 0; i < recUser.size(); i++)
         writeData<User, S_User>(i, recUser[i], USERPATH);
+    
+    dataFile.close();
 }
-
-void Data::addUser(string username, string password, string personId, User::Role role)
-{
-    User newUser(username, password, personId, role);
-    writeData<User, S_User>(recUser.size(), newUser, USERPATH);
-    recUser = loadData<User, S_User>(USERPATH);
-}
-
-int Data::loginUser(string username, string password)
-{
-    for (User &user : recUser)
-    {
-        if (strcmp(username.c_str(), user.getUsername().c_str()) == 0 && strcmp(password.c_str(), user.getPassword().c_str()) == 0)
-            return user.getRole();
-    }
-    return -1;
-}
+// ==================================================================

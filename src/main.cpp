@@ -3,49 +3,25 @@
 #include <cstdlib>
 #include <string>
 #include <tuple>
+#include <sstream>
 
-#include "include/utils.hpp"
 #include "include/data.hpp"
+#include "include/utils.hpp"
 #include "include/user.hpp"
 #include "include/VariadicTable.hpp"
 
 using namespace std;
-// using namespace Utils;
 
 void adminPage(string username);
-void menuUser();
+void menuUser(string username);
 void addUser();
 void removeUser();
+void changePass(string username);
 
 Data recData;
 
 int main()
 {
-	// data.addUser("admin", "Admin", "adminId", User::Role::Admin);
-
-	// recData.addUser("admin", "Admin", "adminId", User::Role::Admin);
-	// recData.addUser("admin1", "Admin1", "adminId", User::Role::Admin);
-	// recData.addUser("admin2", "Admin2", "adminId", User::Role::Admin);
-	// recData.addUser("admin3", "Admin3", "adminId", User::Role::Admin);
-	// recData.addUser("admin4", "Admin4", "adminId", User::Role::Admin);
-	// recData.addUser("admin5", "Admin5", "adminId", User::Role::Admin);
-	// recData.addUser("admin6", "Admin6", "adminId", User::Role::Admin);
-	// recData.addUser("admin7", "Admin7", "adminId", User::Role::Admin);
-	// recData.addUser("admin8", "Admin8", "adminId", User::Role::Admin);
-	// recData.addUser("admin9", "Admin9", "adminId", User::Role::Admin);
-	// recData.addUser("admin10", "Admin10", "adminId", User::Role::Admin);
-	// recData.addUser("admin11", "Admin11", "adminId", User::Role::Admin);
-	// recData.addUser("admin12", "Admin12", "adminId", User::Role::Admin);
-	// adminPage();
-
-	// printTable<string, int>(,)
-	// VariadicTable<int, string, string> vt({"No", "Username", "Role"});
-	// vector<tuple<int, string, string>> Ah;
-	// tuple<int, string, string> yes = make_tuple(1, "admin", "Admin");
-	// Ah.push_back(yes);
-	// vt.addRow(Ah[0]);
-	// vt.print(cout);
-
 	// exit(0);
 
 	string usernameInput;
@@ -62,10 +38,8 @@ int main()
 		cout << "by Kenanya" << endl << endl << endl;
 		cout << "-> Username: ";
 		cin >> usernameInput;
-		// getline(cin, usernameInput);
 		cout << "-> Password: ";
 		cin >> passwordInput;
-		// getline(cin, passwordInput);
 		cin.ignore();
 		switch (recData.loginUser(usernameInput, passwordInput))
 		{
@@ -114,6 +88,7 @@ void adminPage(string username)
 		cout << "  3. Tampilkan Dosen" << endl;
 		cout << "  4. Tampilkan Tenaga Kependidikan" << endl;
 		cout << "  5. Tampilkan Mahasiswa" << endl;
+		cout << "  9. Ganti password" << endl;
 		cout << "  0. Log out" << endl;
 		cout << "-> Pilihan: ";
 		cin >> menu;
@@ -124,7 +99,10 @@ void adminPage(string username)
 		case 0:
 			return;
 		case 1:
-			menuUser();
+			menuUser(username);
+			break;
+		case 9:
+			changePass(username);
 			break;
 		default:
 			break;
@@ -132,7 +110,7 @@ void adminPage(string username)
 	}
 }
 
-void menuUser()
+void menuUser(string username)
 {
 	int page = 1;
 	while (1)
@@ -143,12 +121,13 @@ void menuUser()
 		cout << "Menu: " << endl;
 		cout << "  1. Tambah User(Admin)" << endl;
 		cout << "  2. Hapus User" << endl;
-		cout << "  3. Ganti Password" << endl;
 		cout << "  >. Tampilkan Selanjutnya" << endl;
 		cout << "  <. Tampilkan Sebelumnya" << endl;
 		cout << "  0. Kembali" << endl;
 		cout << "-> Pilihan: ";
 		cin >> menu;
+		cin.ignore();
+
 		switch (menu)
 		{
 		case '0':
@@ -179,9 +158,10 @@ void addUser()
 	cin >> username;
 	cout << "-> Password: ";
 	cin >> password;
+	cin.ignore();
+
 	recData.addUser(username, password, "adminId", User::Role::Admin);
 	cout << endl << "Berhasil menambahkan admin!" << endl;
-	cin.ignore();
 	cin.ignore();
 }
 
@@ -190,7 +170,7 @@ void removeUser()
 	int page = 1;
 	while (1)
 	{
-		char menu;
+		string menu;
 		clearScreen();
 		printTable(User::makeTuples(recData.getAllUser()), User::tuplesHeader(), page);
 		cout << "Menu: " << endl;
@@ -200,24 +180,60 @@ void removeUser()
 		cout << "    0. Kembali" << endl;
 		cout << "-> Pilihan: ";
 		cin >> menu;
-		switch (menu)
-		{
-		case '0':
+		cin.ignore();
+
+		if (menu == "0"){
 			return;
-		case '1':
-			// addUser();
-			break;
-		case '2':
-			// removeUser();
-			break;
-		case '>':
+		} else if (menu == ">"){
 			page++;
-			break;
-		case '<':
+		} else if (menu == "<"){
 			page--;
-			break;
-		default:
-			break;
+		}
+		else {
+			int select;
+			stringstream temp(menu);
+			temp >> select;
+			if (select > 10 * (page - 1) && select <= recData.getUserSize())
+			{
+				cout << endl << "Anda yakin ingin menghapus " << recData.getUser(select - 1)->getUsername() << endl;
+				cout << "-> [y/n]: ";
+				cin >> menu;
+				if (menu == "y" || menu == "Y")
+				{
+					recData.removeUser(select - 1);
+					cout << endl << "User telah dihapus!" << endl;
+					cin.ignore();
+				}
+				return;
+			}
 		}
 	}
+}
+
+void changePass(string username)
+{
+	clearScreen();
+	string oldPass, newPass, reNewPass;
+	cout << "Password lama:\n-> ";
+	cin >> oldPass;
+	cout << "Password baru:\n-> ";
+	cin >> newPass;
+	cout << "Ketik ulang password baru:\n-> ";
+	cin >> reNewPass;
+	cin.ignore();
+
+	User *user = recData.getUser(username);
+	if (user->getPassword() == oldPass)
+	{
+		if (newPass == reNewPass)
+		{
+			user->changePassword(newPass);
+			recData.updateUser(username);
+			cout << endl << "Password berhasil diubah!" << endl;
+			cin.ignore();
+			return;
+		}
+	}
+	cout << endl << "Password tidak sama!" << endl;
+	cin.ignore();
 }

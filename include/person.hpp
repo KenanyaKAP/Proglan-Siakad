@@ -5,21 +5,21 @@
 
 class Person {
 private:
-	char id[20];
-	char name[100];
+	std::string id;
+	std::string name;
 	int dd, mm, yy;
 
 public:
-	Person(char *id, char *name, int dd, int mm, int yy);
+	Person(std::string id, std::string name, int dd, int mm, int yy);
 
-	char *getId();
-	char *getName();
+	std::string getId();
+	std::string getName();
 	int getTglLahir();
 	int getBulanLahir();
 	int getTahunLahir();
 
-	void setId(char *id);
-	void setName(char *name);
+	void setId(std::string id);
+	void setName(std::string name);
 
 	void setTglLahir(int dd, int mm, int yy);
 };

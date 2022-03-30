@@ -24,13 +24,15 @@ public:
     Data();
 
     int loginUser(std::string username, std::string password);
-    void loadData();
 
+    // User
     int getUserSize();
     std::vector<User> *getAllUser();
+    User *getUser(int index);
     User *getUser(std::string username);
-    void addUser(std::string username, std::string password, std::string personId, User::Role role);
     void updateUser(std::string username);
+    void addUser(std::string username, std::string password, std::string personId, User::Role role);
+    void removeUser(int index);
     void removeUser(std::string username);
     
 };
