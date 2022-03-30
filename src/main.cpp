@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstring>
 #include <cstdlib>
+#include <string>
 
 #include "include/utils.hpp"
 #include "include/data.hpp"
@@ -11,13 +12,13 @@ using namespace std;
 void AdminPage();
 void ShowDepartemen();
 
+Data recData;
+
 int main()
 {
-	Data data;
-
-	cin.ignore();
-
 	// data.addUser("admin", "Admin", "adminId", User::Role::Admin);
+
+	// AdminPage();
 
 	string usernameInput;
 	string passwordInput;
@@ -33,22 +34,27 @@ int main()
 		cout << "by Kenanya" << endl << endl << endl;
 		cout << "-> Username: ";
 		cin >> usernameInput;
+		// getline(cin, usernameInput);
 		cout << "-> Password: ";
 		cin >> passwordInput;
+		// getline(cin, passwordInput);
 		cin.ignore();
-		switch (data.loginUser((char*)usernameInput.c_str(), (char*)passwordInput.c_str()))
+		switch (recData.loginUser((char*)usernameInput.c_str(), (char*)passwordInput.c_str()))
 		{
 		case 0: // Admin
 			AdminPage();
 			break;
 		case 1: // Dosen
 			cout << "You are Dosen!" << endl;
+			cin.ignore();
 			break;
 		case 2: // Tendik
 			cout << "You are Tendik!" << endl;
+			cin.ignore();
 			break;
 		case 3: // Mahasiswa
 			cout << "You are Mahasiswa!" << endl;
+			cin.ignore();
 			break;
 		default: // Error
 			cout << "\nUsername/ID or password is incorrect!" << endl;
@@ -68,37 +74,35 @@ void AdminPage()
 		clearScreen();
 		int menu;
 		cout << "Welcome, Admin!" << endl << endl;
-		cout << "  1. Jumlah Departemen            : " << "BLOM" << " Departemen" << endl;
-		cout << "  2. Jumlah Dosen                 : " << "BLOM" << " Dosen" << endl;
-		cout << "  3. Jumlah Tenaga Kependidikan   : " << "BLOM" << " Tendik" << endl;
-		cout << "  4. Jumlah Mahasiswa             : " << "BLOM" << " Mahasiswa" << endl;
+		cout << "  1. Jumlah User                  : " << recData.getUserSize() << " User" << endl;
+		cout << "  2. Jumlah Departemen            : " << "BLOM" << " Departemen" << endl;
+		cout << "  3. Jumlah Dosen                 : " << "BLOM" << " Dosen" << endl;
+		cout << "  4. Jumlah Tenaga Kependidikan   : " << "BLOM" << " Tendik" << endl;
+		cout << "  5. Jumlah Mahasiswa             : " << "BLOM" << " Mahasiswa" << endl;
 		cout << endl;
 		cout << "Menu: " << endl;
-		cout << "  1. Tampilkan semua Departemen" << endl;
-		cout << "  2. Tampilkan semua Dosen" << endl;
-		cout << "  3. Tampilkan semua Tenaga Kependidikan" << endl;
-		cout << "  4. Tampilkan semua Mahasiswa" << endl;
-		cout << "  5. Tambah Departemen" << endl;
-		cout << "  6. Tambah Dosen" << endl;
-		cout << "  7. Tambah Tenaga Kependidikan" << endl;
-		cout << "  8. Tambah Mahasiswa" << endl;
+		cout << "  1. User" << endl;
+		cout << "  2. Departemen" << endl;
+		cout << "  9. Load Data" << endl;
 		cout << "  0. Log out" << endl;
 		cout << "-> Pilihan: ";
 		cin >> menu;
+		cin.ignore();
+
+		vector<vector<string>> userVector = User::MakeVector(recData.getAllUser());
 		switch (menu)
 		{
 		case 0:
 			return;
 		case 1:
-			ShowDepartemen();
+			cin >> menu;
+			cout << "No\t" << "Username\t" << "Role" << endl;
+			printVector(userVector, 1);
+			cin.ignore();
+			cin.ignore();
 			break;
 		default:
 			break;
 		}
 	}
-}
-
-void ShowDepartemen()
-{
-	
 }

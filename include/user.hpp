@@ -19,6 +19,7 @@ private:
     std::string password;
     std::string personId;
     Role role;
+    static std::string getRoleString(Role role);
 
 public:
     User();
@@ -30,6 +31,7 @@ public:
     std::string getPersonId();
     Role getRole();
     void changePassword(std::string newPassword);
+    static std::vector<std::vector<std::string>> MakeVector(std::vector<User> *users);
 };
 
 class S_User {
@@ -41,7 +43,7 @@ public:
 
     S_User();
     S_User(User user);
-    S_User(const char *username, const char *password, const char *personId, User::Role role);
+    // S_User(const char *username, const char *password, const char *personId, User::Role role);
 };
 
 #endif

@@ -23,16 +23,16 @@ private:
 public:
     Data();
 
+    int loginUser(std::string username, std::string password);
+    void loadData();
+
     int getUserSize();
     std::vector<User> *getAllUser();
-    User *getUser(char *username);
-    void removeUser(char *username);
-    void addUser(const char *username, const char *password, const char *personId, User::Role role);
-    void addUser(char *username, char *password, char *personId, User::Role role);
-    int loginUser(char *username, char *password);
-
-    void checkUname(char *uname);
-
+    User *getUser(std::string username);
+    void addUser(std::string username, std::string password, std::string personId, User::Role role);
+    void updateUser(std::string username);
+    void removeUser(std::string username);
+    
 };
 
 #endif
