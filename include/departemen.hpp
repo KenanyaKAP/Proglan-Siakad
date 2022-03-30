@@ -9,7 +9,7 @@ private:
     char id[20];
     char name[100];
 
-    std::vector<char[20]> dosenIds;
+    std::vector<char*> dosenIds;
 
 public:
     Departemen(char *id, char *name);

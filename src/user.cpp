@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "include/user.hpp"
+#include "include/VariadicTable.hpp"
 
 using namespace std;
 
@@ -84,19 +85,44 @@ string User::getRoleString(User::Role role)
     }
 }
 
-vector<vector<string>> User::MakeVector(vector<User> *users)
+// vector<vector<string>> User::MakeVector(vector<User> *users)
+// {
+//     vector<vector<string>> vectors;
+//     vectors.push_back({"Username", "Role"});
+//     for (User &user : *users)
+//     {
+//         vector<string> row;
+//         row.push_back(user.getUsername());
+//         row.push_back(getRoleString(user.getRole()));
+//         vectors.push_back(row);
+//     }
+//     return vectors;
+// }
+
+// VariadicTable<int, string, string> User::MakeTable(vector<User> *users)
+// {
+//     VariadicTable<int, string, string> vt({"No", "Username", "Role"});
+//     for (int i = 0; i < users->size(); i++)
+//     {
+//         vt.addRow(i+1, users->at(i).getUsername(), User::GetRoleString(users->at(i).getRole()));
+//     }
+
+//     return vt;
+// }
+
+vector<tuple<int, string, string>> User::makeTuples(vector<User> *users)
 {
-    vector<vector<string>> vectors;
-    vectors.push_back({"Username", "Role"});
-    for (User &user : *users)
+    vector<tuple<int, string, string>> tuples;
+    for (unsigned int i = 0; i < users->size(); i++)
     {
-        vector<string> row;
-        row.push_back(user.getUsername());
-        row.push_back(getRoleString(user.getRole()));
-        vectors.push_back(row);
+        tuple<int, string, string> user;
+        user = make_tuple(i+1, users->at(i).getUsername(), User::getRoleString(users->at(i).getRole()));
+        tuples.push_back(user);
     }
-    return vectors;
+    return tuples;
 }
+
+vector<string> User::tuplesHeader(){ return {"No", "Username", "Role"}; }
 
 string User::getUsername(){ return this->username; }
 

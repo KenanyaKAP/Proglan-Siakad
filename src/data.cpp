@@ -38,12 +38,11 @@ void Data::loadData()
 {
     // User
     recUser = loadData<User, S_User>(USERPATH);
-    printUser(recUser);
 }
 
 void Data::updateUser(std::string username)
 {
-    for (int i = 0; i < recUser.size(); i++)
+    for (unsigned int i = 0; i < recUser.size(); i++)
     {
         if (strcmp(recUser[i].getUsername().c_str(), username.c_str()) == 0)
         {

@@ -3,6 +3,9 @@
 
 #include <iostream>
 #include <cstring>
+#include <tuple>
+
+// #include "include/VariadicTable.hpp"
 
 class User {
 public:
@@ -31,7 +34,10 @@ public:
     std::string getPersonId();
     Role getRole();
     void changePassword(std::string newPassword);
-    static std::vector<std::vector<std::string>> MakeVector(std::vector<User> *users);
+    // static std::vector<std::vector<std::string>> MakeVector(std::vector<User> *users);
+    // static VariadicTable<int, std::string, std::string> MakeTable(std::vector<User> *users);
+    static std::vector<std::tuple<int, std::string, std::string>> makeTuples(std::vector<User> *users);
+    static std::vector<std::string> tuplesHeader();
 };
 
 class S_User {
