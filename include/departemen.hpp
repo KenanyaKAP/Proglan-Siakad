@@ -20,4 +20,12 @@ public:
     void addDosen(std::string id);
 };
 
+class S_Departemen {
+private:
+    char id[20];
+    char name[100];
+
+    
+};
+
 #endif

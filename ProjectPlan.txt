@@ -1,41 +1,161 @@
-Welcome to Simakad!
+Saver class (static)
 
-Login as Admin:
-full control
+Save(vector<class>, path);
 
-Login as Dosen:
-
-Login as Tendik:
-
-Login as Mahasiswa:
+auto data = Load(path);
 
 
-░██████╗██╗░█████╗░██╗░░██╗░█████╗░██████╗░
-██╔════╝██║██╔══██╗██║░██╔╝██╔══██╗██╔══██╗
-╚█████╗░██║███████║█████═╝░███████║██║░░██║
-░╚═══██╗██║██╔══██║██╔═██╗░██╔══██║██║░░██║
-██████╔╝██║██║░░██║██║░╚██╗██║░░██║██████╔╝
-╚═════╝░╚═╝╚═╝░░╚═╝╚═╝░░╚═╝╚═╝░░╚═╝╚═════╝░
+===============================================
+ ____  _       _             _ 
+/ ___|(_) __ _| | ____ _  __| |
+\___ \| |/ _` | |/ / _` |/ _` |
+ ___) | | (_| |   < (_| | (_| |
+|____/|_|\__,_|_|\_\__,_|\__,_|
+
 by Kenanya
 
 
-███████╗██╗ █████╗ ██╗  ██╗ █████╗ ██████╗ 
-██╔════╝██║██╔══██╗██║ ██╔╝██╔══██╗██╔══██╗
-███████╗██║███████║█████╔╝ ███████║██║  ██║
-╚════██║██║██╔══██║██╔═██╗ ██╔══██║██║  ██║
-███████║██║██║  ██║██║  ██╗██║  ██║██████╔╝
-╚══════╝╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝ 
-by Kenanya
+-> Username: 
+-> Password:
 
-  ____  _       _             _ 
- / ___|(_) __ _| | ____ _  __| |
- \___ \| |/ _` | |/ / _` |/ _` |
-  ___) | | (_| |   < (_| | (_| |
- |____/|_|\__,_|_|\_\__,_|\__,_|
-                                
-by Kenanya
+Username/ID or password is incorrect!
+===============================================
+Admin
+Welcome, admin!
+  1. Jumlah User                  : 0 User
+  2. Jumlah Departemen            : 0 Departemen
+  3. Jumlah Dosen                 : 0 Dosen
+  4. Jumlah Tenaga Kependidikan   : 0 Tendik
+  5. Jumlah Mahasiswa             : 0 Mahasiswa
 
+Menu: 
+  1. Tampilkan User
+  2. Tampilkan Departemen
+  3. Tampilkan Dosen
+  4. Tampilkan Tenaga Kependidikan
+  5. Tampilkan Mahasiswa
+  9. Ganti password
+  0. Log out
+-> Pilihan:
+===============================================
+-------------------------
+| No | Username | Role  |
+-------------------------
+|  1 | admin    | Admin |
+|  2 | toto     | Admin |
+|  0 |          |       |
+|  0 |          |       |
+|  0 |          |       |
+|  0 |          |       |
+|  0 |          |       |
+|  0 |          |       |
+|  0 |          |       |
+|  0 |          |       |
+-------------------------
 
-Dosen > user
-Mahasiswa > user
-Departepen
+Menu: 
+  1. Tambah User(Admin)
+  2. Hapus User
+  >. Tampilkan Selanjutnya
+  <. Tampilkan Sebelumnya
+  0. Kembali
+-> Pilihan: 
+===============================================
+-------------------------------
+| No | Nama Departemen | Kode |
+-------------------------------
+|  1 | Teknik Komputer | 5024 |
+|  2 | Teknik Elektro  | 5013 |
+|  0 |                 |      |
+|  0 |                 |      |
+|  0 |                 |      |
+|  0 |                 |      |
+|  0 |                 |      |
+|  0 |                 |      |
+|  0 |                 |      |
+|  0 |                 |      |
+-------------------------------
+
+Menu: 
+  1. Tambah Departemen
+  2. Hapus Departemen
+  3. Tampilkan Detail
+  >. Tampilkan Selanjutnya
+  <. Tampilkan Sebelumnya
+  0. Kembali
+-> Pilihan: 
+===============================================
+-----------------------------------------------
+ 1/24   Teknik Komputer
+-----------------------------------------------
+Kode Departemen     : 
+Jumlah Dosen        :
+Jumlah Mata Kuliah  :
+Jumlah Mahasiswa    :
+-----------------------------------------------
+
+Menu:
+  1. Tampilkan Semua Dosen
+  2. Tampilkan Semua Mata Kuliah
+  3. Tampilkan Semua Mahasiswa
+  >. Tampilkan Selanjutnya
+  <. Tampilkan Sebelumnya
+  0. Kembali
+-> Pilihan: 
+===============================================
+-----------------------------------------------
+ 1/5    Dosen Prasetyo
+-----------------------------------------------
+NPP                 :
+Tanggal Lahir       :
+No Hp               :
+Pendidikan          :
+Departemen          :
+Mata Kuliah Ajar    :
+-----------------------------------------------
+
+Menu:
+  1. Tampilkan Semua Kuliah Ajar
+  >. Tampilkan Selanjutnya
+  <. Tampilkan Sebelumnya
+  0. Kembali
+-> Pilihan: 
+===============================================
+-----------------------------------------------
+ 1/10   Pemrograman Lanjutan
+-----------------------------------------------
+Kode                :
+Jumlah Kelas        :
+Jumlah Pengampu     :
+-----------------------------------------------
+
+Menu:
+  >. Tampilkan Selanjutnya
+  <. Tampilkan Sebelumnya
+  0. Kembali
+-> Pilihan: 
+===============================================
+-----------------------------------------------
+ 1/5    Mahasiswa Adriel
+-----------------------------------------------
+NRP                 :
+Departemen          :
+Dosen Wali          :
+Tanggal Lahir       :
+No Hp               :
+Tahun Masuk         :
+Semester            :
+SKS Lulus           :
+IPK                 :
+-----------------------------------------------
+
+Menu:
+  1. Tampilkan IPS
+  2. Tampilkan FRS
+  >. Tampilkan Selanjutnya
+  <. Tampilkan Sebelumnya
+  0. Kembali
+-> Pilihan: 
+===============================================
+===============================================
+===============================================
