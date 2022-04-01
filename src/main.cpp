@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <sstream>
 
 #include "include/save.hpp"
 #include "include/user.hpp"
@@ -97,7 +98,7 @@ void showUserPage(vector<User> *users)
 		cout << "Menu: " << endl;
 		cout << "  1. Tambah User(Admin)" << endl;
 		cout << "  2. Hapus User" << endl;
-		if (page <= users->size() / 10)
+		if (page <= int((users->size() - 1) / 10))
 			cout << "  >. Tampilkan Selanjutnya" << endl;
 		if (page > 1)
 			cout << "  <. Tampilkan Sebelumnya" << endl;
@@ -110,8 +111,68 @@ void showUserPage(vector<User> *users)
 		{
 		case '0':
 			return;
+		case '1':
+			{
+				// string username, password;
+				// Utils::clearScreen();
+				// cout << "-> Username: ";
+				// cin >> username;
+				// cout << "-> Password: ";
+				// cin >> password;
+				// cin.ignore();
+
+				// recData.addUser(username, password, "adminId", User::Role::Admin);
+				// cout << endl << "Berhasil menambahkan admin!" << endl;
+				// cin.ignore();
+			}
+			break;
+		case '2':
+			{
+				while (1)
+				{
+					string menu;
+					Utils::clearScreen();
+					Utils::printTable<string, string>(User::makeTuples(users), User::tuplesHeader(), page);
+					cout << endl;
+					cout << "Menu: " << endl;
+					cout << " 1~10. Pilih user yang akan dihapus" << endl;
+					if (page <= int((users->size() - 1) / 10))
+						cout << "    >. Tampilkan Selanjutnya" << endl;
+					if (page > 1)
+						cout << "    <. Tampilkan Sebelumnya" << endl;
+					cout << "    0. Kembali" << endl;
+					cout << "-> Pilihan: ";
+					cin >> menu;
+					cin.ignore();
+
+					if (menu == "0") break;
+					else if (menu == ">" && page <= int((users->size() - 1) / 10)) page++;
+					else if (menu == "<" && page > 1) page--;
+					else {
+						int select;
+						stringstream temp(menu);
+						temp >> select;
+						if (select > 10 * (page - 1) && select <= (int)users->size())
+						{
+							cout << endl << "Anda yakin ingin menghapus " << users->at(select - 1).getUsername() << endl;
+							cout << "-> [y/n]: ";
+							cin >> menu;
+							cin.ignore();
+							if (menu == "y" || menu == "Y")
+							{
+								recUser.erase(recUser.begin() + select - 1);
+								Save::saveData(&recUser, USERPATH);
+								cout << endl << "User telah dihapus!" << endl;
+								cin.ignore();
+							}
+							break;
+						}
+					}
+				}
+			}
+			break;
 		case '>':
-			if (page <= users->size() / 10)
+			if (page <= int((users->size() - 1) / 10))
 			{
 				page++;
 			}
