@@ -4,16 +4,12 @@
 #include <iostream>
 #include <vector>
 
-class Save
-{
-private:
-    Save(){}
-    
-public:
-    template <class T>
-    static void saveData(std::vector<T> data);
-};
+class User;
 
-#include "tpp/save.tpp"
+namespace Save
+{
+    void saveData(std::vector<User> *data, const char *path);
+    void loadData(std::vector<User> &out, const char *path);
+};
 
 #endif
