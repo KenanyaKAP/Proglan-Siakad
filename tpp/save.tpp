@@ -5,9 +5,8 @@
 
 using namespace std;
 
-int main()
+template <class T>
+void Save::saveData(vector<T> data)
 {
-	Save::saveData(vector<int> {1,23,34});
-	
-	return 0;
+    cout << "AH\n";
 }
