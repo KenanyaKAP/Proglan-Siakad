@@ -319,14 +319,14 @@ void showDetailDepartemen(vector<Departemen> *departemens)
 		cout << " " << index + 1 << "/" << departemens->size() << "\t" << departemens->at(index).getName() << endl;
 		cout << "-----------------------------------------------" << endl;
 		cout << "Kode Departemen     : " << departemens->at(index).getKode() << endl;
-		cout << "Jumlah Dosen        : " << 0 << endl;
 		cout << "Jumlah Mata Kuliah  : " << departemens->at(index).getAllMatkulId()->size() << endl;
+		cout << "Jumlah Dosen        : " << departemens->at(index).getAllDosenId()->size() << endl;
 		cout << "Jumlah Mahasiswa    : " << departemens->at(index).getAllMahasiswaId()->size() << endl;
 		cout << "-----------------------------------------------" << endl;
 		cout << endl;
 		cout << "Menu: " << endl;
-		cout << "  1. Tampilkan Semua Dosen" << endl;
-		cout << "  2. Tampilkan Semua Mata Kuliah" << endl;
+		cout << "  1. Tampilkan Semua Mata Kuliah" << endl;
+		cout << "  2. Tampilkan Semua Dosen" << endl;
 		cout << "  3. Tampilkan Semua Mahasiswa" << endl;
 		if (index + 1 < int(departemens->size()))
 			cout << "  >. Tampilkan Selanjutnya" << endl;

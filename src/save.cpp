@@ -65,7 +65,7 @@ void Save::saveData(vector<Departemen> *data, const char *path)
     fstream file;
     file.open(path, ios::trunc | ios::out | ios::in);
     if (!file.is_open()){ cout << "Error while opening " << path << "!" << endl; exit(1); }
-
+    
     for (Departemen &dept : *data)
     {
         file << Utils::encrypt(dept.getName()) << '\0';
@@ -74,6 +74,9 @@ void Save::saveData(vector<Departemen> *data, const char *path)
         file << Utils::encrypt(to_string(dept.getAllMatkulId()->size())) << '\0';
         for (string &matkulId : *dept.getAllMatkulId())
             file << Utils::encrypt(matkulId) << '\0';
+        file << Utils::encrypt(to_string(dept.getAllDosenId()->size())) << '\0';
+        for (string &dosenId : *dept.getAllDosenId())
+            file << Utils::encrypt(dosenId) << '\0';
         file << Utils::encrypt(to_string(dept.getAllMahasiswaId()->size())) << '\0';
         for (string &mhsId : *dept.getAllMahasiswaId())
             file << Utils::encrypt(mhsId) << '\0';
@@ -103,11 +106,14 @@ void Save::loadData(vector<Departemen> &out, const char *path)
             dataString.push_back(temp);
         
         Departemen departemen{dataString[0], dataString[1], dataString[2]};
-        for (int i = 4; i < stoi(dataString[3]) + 4; i++)
+        int v1 = 3;
+        int v2 = 4 + stoi(dataString[v1]);
+        int v3 = 5 + stoi(dataString[v1]) + stoi(dataString[v2]);
+        for (int i = v1 + 1; i < v2; i++)
             departemen.addMatkul(dataString[i]);
-        for (int i = 5 + stoi(dataString[3]);
-                 i < 5 + stoi(dataString[3]) + stoi(dataString[4 + stoi(dataString[3])]);
-                 i++)
+        for (int i = v2 + 1; i < v3; i++)
+            departemen.addDosen(dataString[i]);
+        for (int i = v3 + 1; i < v3 + stoi(dataString[v3]) + 1; i++)
             departemen.addMahasiswa(dataString[i]);
         out.push_back(departemen);
     }

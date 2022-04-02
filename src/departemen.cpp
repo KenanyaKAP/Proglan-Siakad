@@ -28,9 +28,13 @@ string Departemen::getId(){ return this->id; }
 
 vector<string> *Departemen::getAllMatkulId(){ return &this->matkulIds; }
 
+vector<string> *Departemen::getAllDosenId(){ return &this->dosenIds; }
+
 vector<string> *Departemen::getAllMahasiswaId(){ return &this->mahasiswaIds; }
 
 void Departemen::addMatkul(string id){ this->matkulIds.push_back(id); }
+
+void Departemen::addDosen(string id){ this->dosenIds.push_back(id); }
 
 void Departemen::addMahasiswa(string id){ this->mahasiswaIds.push_back(id); }
 // ==================================================================
