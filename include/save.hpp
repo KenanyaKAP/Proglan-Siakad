@@ -6,6 +6,7 @@
 
 class User;
 class Departemen;
+class Matkul;
 
 namespace Save
 {
@@ -13,6 +14,8 @@ namespace Save
     void loadData(std::vector<User> &out, const char *path);
     void saveData(std::vector<Departemen> *data, const char *path);
     void loadData(std::vector<Departemen> &out, const char *path);
+    void saveData(std::vector<Matkul> *data, const char *path);
+    void loadData(std::vector<Matkul> &out, const char *path);
 };
 
 #endif

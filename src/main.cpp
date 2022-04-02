@@ -9,19 +9,23 @@
 #include "include/person.hpp"
 #include "include/user.hpp"
 #include "include/departemen.hpp"
+#include "include/matkul.hpp"
 
 #define USERPATH "data/user.bin"
 #define DEPARTEMENPATH "data/departemen.bin"
+#define MATKULPATH "data/matkul.bin"
 
 using namespace std;
 
 vector<User> recUser;
 vector<Departemen> recDepartemen;
+vector<Matkul> recMatkul;
 
 void adminPage(User *user);
 void showUserPage(vector<User> *users);
 void showDepartemenPage(vector<Departemen> *departemens);
 void showDetailDepartemen(vector<Departemen> *departemens);
+void showMatkulPage(vector<Matkul*> *matkuls);
 
 // ==================================================================	
 
@@ -311,23 +315,25 @@ void showDepartemenPage(vector<Departemen> *departemens)
 void showDetailDepartemen(vector<Departemen> *departemens)
 {
 	int index = 0;
+	Departemen &departemen = departemens->at(index);
 	char menu;
 	while (1)
 	{
 		Utils::clearScreen();
 		cout << "-----------------------------------------------" << endl;
-		cout << " " << index + 1 << "/" << departemens->size() << "\t" << departemens->at(index).getName() << endl;
+		cout << " " << index + 1 << "/" << departemens->size() << "\t" << departemen.getName() << endl;
 		cout << "-----------------------------------------------" << endl;
-		cout << "Kode Departemen     : " << departemens->at(index).getKode() << endl;
-		cout << "Jumlah Mata Kuliah  : " << departemens->at(index).getAllMatkulId()->size() << endl;
-		cout << "Jumlah Dosen        : " << departemens->at(index).getAllDosenId()->size() << endl;
-		cout << "Jumlah Mahasiswa    : " << departemens->at(index).getAllMahasiswaId()->size() << endl;
+		cout << "Kode Departemen     : " << departemen.getKode() << endl;
+		cout << "Jumlah Mata Kuliah  : " << departemen.getAllMatkulId()->size() << endl;
+		cout << "Jumlah Dosen        : " << departemen.getAllDosenId()->size() << endl;
+		cout << "Jumlah Mahasiswa    : " << departemen.getAllMahasiswaId()->size() << endl;
 		cout << "-----------------------------------------------" << endl;
 		cout << endl;
 		cout << "Menu: " << endl;
 		cout << "  1. Tampilkan Semua Mata Kuliah" << endl;
 		cout << "  2. Tampilkan Semua Dosen" << endl;
 		cout << "  3. Tampilkan Semua Mahasiswa" << endl;
+		cout << "  4. Tambah Mata Kuliah" << endl;
 		if (index + 1 < int(departemens->size()))
 			cout << "  >. Tampilkan Selanjutnya" << endl;
 		if (index > 0)
@@ -342,6 +348,29 @@ void showDetailDepartemen(vector<Departemen> *departemens)
 		case '0':
 			return;
 		case '1':
+			showMatkulPage(Matkul::getMatkulByDepartemenId(&recMatkul, departemen.getId()));
+			break;
+		case '2':
+			break;
+		case '3':
+			break;
+		case '4':
+			{
+				string matkulName, matkulKode;
+				int matkulSKS;
+				Utils::clearScreen();
+				cout << "Nama mata kuliah	: ";
+				getline(cin, matkulName);
+				cout << "Kode mata kuliah	: ";
+				getline(cin, matkulName);
+				cout << "SKS mata kuliah	: ";
+				cin >> matkulSKS;
+				
+				// recMatkul.push_back(Matkul(matkulName, matkulKode, matkulSKS, (recMatkul.size() > 0) ? Matkul::matkulIdAddOne(recMatkul.back().getId()) : "m_0"));
+				// Save::saveData(&recMatkul, MATKULPATH);
+				
+				// Save::saveData(&recDepartemen, DEPARTEMENPATH);
+			}
 			break;
 		case '>':
 			if (index + 1 < int(departemens->size())) index++;
@@ -357,12 +386,86 @@ void showDetailDepartemen(vector<Departemen> *departemens)
 
 // ==================================================================
 
+void showMatkulPage(vector<Matkul*> *matkuls)
+{
+	if (!matkuls)
+	{
+		cout << endl << "Departemen tidak memiliki mata kuliah!" << endl;
+		cin.ignore();
+		return;
+	}
+
+	int index = 0;
+	Matkul *matkul = matkuls->at(index);
+	char menu;
+	while (1)
+	{
+		cout << "-----------------------------------------------" << endl;
+		cout << " " << index + 1 << "/" << matkuls->size() << "\t" << matkul->getName() << endl;
+		cout << "-----------------------------------------------" << endl;
+		cout << "Kode                :" << matkul->getKode() << endl;
+		cout << "SKS                 :" << matkul->getSKS() << endl;
+		cout << "Jumlah Kelas        :" << matkul->getAllKelasId()->size() << endl;
+		cout << "Jumlah Pengampu     :" << matkul->getAllDosenId()->size() << endl;
+		cout << "-----------------------------------------------" << endl;
+		cout << endl;
+		cout << "Menu:" << endl;
+		cout << "  1. Tampilkan Semua Kelas" << endl;
+		cout << "  >. Tampilkan Selanjutnya" << endl;
+		cout << "  <. Tampilkan Sebelumnya" << endl;
+		cout << "  0. Kembali" << endl;
+		cout << "-> Pilihan: " << endl;
+		cin >> menu;
+		cin.ignore();
+	}
+}
+
+// ==================================================================
+
 
 
 // ==================================================================
 
 int main()
 {
+	vector<Matkul> temp;
+	// temp.push_back(Matkul("Pemrograman Lanjutan", "EC123456", 3, "m_0", "d_0"));
+	// temp[0].addDosen("p_0");
+	// temp[0].addDosen("p_1");
+	// temp[0].addKelas("k_0");
+	// temp[0].addKelas("k_1");
+	// temp[0].addKelas("k_2");
+	// temp[0].addKelas("k_3");
+	// temp.push_back(Matkul("Rangkaian Listrik", "EW123456", 2, "m_1", "d_0"));
+	// temp.push_back(Matkul("Fisika 2", "SF123456", 3, "m_2", "d_0"));
+	// temp.push_back(Matkul("Kimia 1", "SK123456", 3, "m_3", "d_0"));
+	// temp.push_back(Matkul("Bahasa Indonesia", "UG123456", 3, "m_4", "d_0"));
+
+	// Save::saveData(&temp, MATKULPATH);
+	Save::loadData(temp, MATKULPATH);
+
+	for (Matkul &matkul : temp)
+	{
+		cout << matkul.getName() << endl;
+		cout << matkul.getKode() << endl;
+		cout << matkul.getSKS() << endl;
+		cout << matkul.getId() << endl;
+		cout << matkul.getDepartemenId() << endl;
+		for (string &dosenId : *matkul.getAllDosenId())
+		{
+			cout << dosenId << "|";
+		}
+		cout << endl;
+		for (string &kelasId : *matkul.getAllKelasId())
+		{
+			cout << kelasId << "|";
+		}
+		cout << endl;
+		cout << endl;
+	}
+
+	exit(0);
+
 	Save::loadData(recUser, USERPATH);
 	Save::loadData(recDepartemen, DEPARTEMENPATH);
 

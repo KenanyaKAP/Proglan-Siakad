@@ -98,6 +98,7 @@ Menu:
   1. Tampilkan Semua Dosen
   2. Tampilkan Semua Mata Kuliah
   3. Tampilkan Semua Mahasiswa
+  4. Tambah Mata Kuliah
   >. Tampilkan Selanjutnya
   <. Tampilkan Sebelumnya
   0. Kembali
@@ -124,11 +125,13 @@ Menu:
  1/10   Pemrograman Lanjutan
 -----------------------------------------------
 Kode                :
+SKS                 :
 Jumlah Kelas        :
 Jumlah Pengampu     :
 -----------------------------------------------
 
 Menu:
+  1. Tampilkan Semua Kelas
   >. Tampilkan Selanjutnya
   <. Tampilkan Sebelumnya
   0. Kembali
@@ -155,5 +158,62 @@ Menu:
   0. Kembali
 -> Pilihan: 
 ===============================================
+-----------------------------------------------
+ 1/2    Pemrograman Lanjutan (A)
+-----------------------------------------------
+Kelas               : A
+Ruang               : TW1-202
+Dosen Pengampu      : Ratna
+Jumlah Mahasiswa    : 35
+-----------------------------------------------
+
+Menu:
+  1. Tampilkan Semua Mahasiswa
+  >. Tampilkan Selanjutnya
+  <. Tampilkan Sebelumnya
+  0. Kembali
+-> Pilihan: 
 ===============================================
+------------------------
+| Semester |    IPS    |
+------------------------
+|        1 |       3.4 |
+|        2 |       3.4 |
+|        3 |       3.4 |
+|        4 |       3.4 |
+|        5 |       3.4 |
+|        6 |       3.4 |
+|        7 |       3.4 |
+|        8 |       3.4 |
+|        9 |       3.4 |
+|       10 |       3.4 |
+------------------------
+
+Menu:
+  >. Tampilkan Selanjutnya
+  <. Tampilkan Sebelumnya
+  0. Kembali
+-> Pilihan: 
+===============================================
+Nama        : Kenanya Keandra Adriel Prasetyo
+NRP         : 5024211004
+Semester    : 2
+Dosen Wali  : Supeno Mardi Susiki Nugroho
+
+---------------------------------------------------------
+|   Kode   |     Mata Kuliah      | SKS | Kelas | Nilai |
+---------------------------------------------------------
+| EW342458 | Pemrograman Lanjutan |   3 |   A   |   *   |
+| EW342458 | Pemrograman Lanjutan |   3 |   A   |   *   |
+| EW342458 | Pemrograman Lanjutan |   3 |   A   |   *   |
+| EW342458 | Pemrograman Lanjutan |   3 |   A   |   *   |
+| EW342458 | Pemrograman Lanjutan |   3 |   A   |   *   |
+| EW342458 | Pemrograman Lanjutan |   3 |   A   |   *   |
+| EW342458 | Pemrograman Lanjutan |   3 |   A   |   *   |
+---------------------------------------------------------
+Total:  21 SKS
+
+Menu:
+  0. Kembali
+-> Pilihan: 
 ===============================================
