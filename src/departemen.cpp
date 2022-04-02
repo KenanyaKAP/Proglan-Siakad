@@ -37,6 +37,18 @@ void Departemen::addMatkul(string id){ this->matkulIds.push_back(id); }
 void Departemen::addDosen(string id){ this->dosenIds.push_back(id); }
 
 void Departemen::addMahasiswa(string id){ this->mahasiswaIds.push_back(id); }
+
+void Departemen::delMatkul(string id)
+{
+    for (unsigned int i = 0; i < matkulIds.size(); i++)
+    {
+        if (matkulIds[i] == id)
+        {
+            matkulIds.erase(matkulIds.begin() + i);
+            return;
+        }
+    }
+}
 // ==================================================================
 
 

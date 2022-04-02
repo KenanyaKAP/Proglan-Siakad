@@ -1,5 +1,7 @@
 #include <iostream>
 #include <string>
+#include <vector>
+#include <tuple>
 #include <sstream>
 
 #include "include/matkul.hpp"
@@ -33,21 +35,21 @@ vector<string> *Matkul::getAllKelasId(){ return &this->kelasId; }
 
 vector<string> *Matkul::getAllDosenId(){ return &this->dosenId; }
 
-void Matkul::addDosen(std::string id){ this->dosenId.push_back(id); }
+void Matkul::addDosen(string id){ this->dosenId.push_back(id); }
 
-void Matkul::addKelas(std::string id){ this->kelasId.push_back(id); }
+void Matkul::addKelas(string id){ this->kelasId.push_back(id); }
 // ==================================================================
 
 
 
 // ===================== Public Static Function =====================
-vector<Matkul*> *Matkul::getMatkulByDepartemenId(vector<Matkul> *matkuls, string departemenId)
+vector<Matkul*> Matkul::getMatkulsByDepartemenId(vector<Matkul> *matkuls, string departemenId)
 {
-    vector<Matkul*> *output = {};
+    vector<Matkul*> output;
 
     for (Matkul &matkul : *matkuls)
         if (matkul.getDepartemenId() == departemenId)
-            output->push_back(&matkul);
+            output.push_back(&matkul);
 
     return output;
 }
@@ -64,5 +66,35 @@ string Matkul::matkulIdAddOne(string personId)
 	stringstream ss;
 	ss << "m_" << stoi(personId) + 1;
 	return ss.str();
+}
+
+vector<tuple<string, string, int>> Matkul::makeTuples(vector<Matkul*> *matkuls)
+{
+    vector<tuple<string, string, int>> tuples;
+    for (unsigned int i = 0; i < matkuls->size(); i++)
+    {
+        tuple<string, string, int> matkul;
+        matkul = make_tuple(matkuls->at(i)->getName(), matkuls->at(i)->getKode(), matkuls->at(i)->getSKS());
+        tuples.push_back(matkul);
+    }
+    return tuples;
+}
+
+vector<string> Matkul::tuplesHeader(){ return {"Nama Matkul", "Kode", "SKS"}; }
+
+int Matkul::getPosition(vector<Matkul> matkuls, Matkul *target)
+{
+    for (int i = 0; i < int(matkuls.size()); i++)
+        if (matkuls[i].getId() == target->getId())
+            return i;
+    return -1;
+}
+
+int Matkul::getPosition(vector<Matkul> matkuls, string id)
+{
+    for (int i = 0; i < int(matkuls.size()); i++)
+        if (matkuls[i].getId() == id)
+            return i;
+    return -1;
 }
 // ==================================================================
