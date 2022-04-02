@@ -111,7 +111,7 @@ NPP                 :
 Tanggal Lahir       :
 Pendidikan          :
 Departemen          :
-Mata Kuliah Ajar    :
+Kelas Ajar          :
 -----------------------------------------------
 
 Menu:

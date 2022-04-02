@@ -214,7 +214,7 @@ void showDepartemenPage(vector<Departemen> *departemens)
 		cout << endl;
 		cout << "Menu: " << endl;
 		cout << "  1. Tambah Departemen" << endl;
-		cout << "  2. Hapus Departemen" << endl;										////
+		cout << "  2. Hapus Departemen" << endl;
 		cout << "  3. Tampilkan Detail" << endl;
 		if (page <= int((departemens->size() - 1) / 10) && departemens->size() > 0)
 			cout << "  >. Tampilkan Selanjutnya" << endl;
