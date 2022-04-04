@@ -7,6 +7,7 @@
 
 #include "include/save.hpp"
 #include "include/utils.hpp"
+#include "include/data.hpp"
 #include "include/user.hpp"
 #include "include/departemen.hpp"
 #include "include/matkul.hpp"
@@ -190,6 +191,46 @@ void Save::loadData(vector<Matkul> &out, const char *path)
         for (int i = v2 + 1; i < v2 + stoi(dataString[v2]) + 1; i++)
             matkul.addKelas(dataString[i]);
         out.push_back(matkul);
+    }
+}
+// ==================================================================
+
+
+
+// ===========================    Data    ===========================
+void Save::saveData(Data *data, const char *path)
+{
+    fstream file;
+    file.open(path, ios::trunc | ios::out | ios::in);
+    if (!file.is_open()){ cout << "Error while opening " << path << "!" << endl; exit(1); }
+
+    file << Utils::encrypt(data->getLastPersonId()) << '\0';
+    file << Utils::encrypt(data->getLastDepartemenId()) << '\0';
+    file << Utils::encrypt(data->getLastMatkulId()) << '\n';
+}
+
+void Save::loadData(Data &out, const char *path)
+{
+    fstream file;
+    file.open(path, ios::in);
+    if (!file.is_open())
+    {
+        file.close();
+        file.open(path, ios::trunc | ios::out | ios::in);
+    }
+    if (!file.is_open()){ cout << "Error while opening " << path << "!" << endl; exit(1); }
+
+    string data, temp;
+    if (getline(file, data))
+    {
+        stringstream ssData(Utils::decrypt(data));
+        vector<string> dataString;
+        while (getline(ssData, temp, '\0'))
+            dataString.push_back(temp);
+        
+        out.setLastPersonId(dataString[0]);
+        out.setLastDepartemenId(dataString[1]);
+        out.setLastMatkulId(dataString[2]);
     }
 }
 // ==================================================================

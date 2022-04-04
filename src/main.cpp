@@ -5,21 +5,26 @@
 
 #include "include/save.hpp"
 #include "include/utils.hpp"
+#include "include/data.hpp"
 
 #include "include/person.hpp"
 #include "include/user.hpp"
 #include "include/departemen.hpp"
 #include "include/matkul.hpp"
+#include "include/dosen.hpp"
 
+#define DATAPATH "data/data.bin"
 #define USERPATH "data/user.bin"
 #define DEPARTEMENPATH "data/departemen.bin"
 #define MATKULPATH "data/matkul.bin"
 
 using namespace std;
 
+Data myData;
 vector<User> recUser;
 vector<Departemen> recDepartemen;
 vector<Matkul> recMatkul;
+vector<Dosen> recDosen;
 
 void adminPage(User *user);
 void showUserPage(vector<User> *users);
@@ -27,6 +32,8 @@ void showDepartemenPage(vector<Departemen> *departemens);
 void showDetailDepartemen(vector<Departemen> *departemens);
 void showMatkulPage(Departemen *departemen);
 void showDetailMatkul(vector<Matkul*> matkuls, Departemen *departemen);
+void showDosenPage(vector<Dosen> *dosens);
+void showDetailDosen(vector<Dosen> *dosens);
 
 // ==================================================================	
 
@@ -45,11 +52,11 @@ void adminPage(User *user)
 		cout << "  5. Jumlah Mahasiswa             : " << 0 << " Mahasiswa" << endl;
 		cout  << endl;
 		cout << "Menu: " << endl;
-		cout << "  1. Tampilkan User" << endl;
-		cout << "  2. Tampilkan Departemen" << endl;
-		cout << "  3. Tampilkan Dosen" << endl;
-		cout << "  4. Tampilkan Tenaga Kependidikan" << endl;
-		cout << "  5. Tampilkan Mahasiswa" << endl;
+		cout << "  1. User" << endl;
+		cout << "  2. Departemen" << endl;
+		cout << "  3. Dosen" << endl;
+		cout << "  4. Tenaga Kependidikan" << endl;
+		cout << "  5. Mahasiswa" << endl;
 		cout << "  9. Ganti password" << endl;
 		cout << "  0. Log out" << endl;
 		cout << "-> Pilihan: ";
@@ -64,6 +71,9 @@ void adminPage(User *user)
 			break;
 		case 2:
 			showDepartemenPage(&recDepartemen);
+			break;
+		case 3:
+			showDosenPage(&recDosen);
 			break;
 		case 9:
 			{
@@ -136,7 +146,7 @@ void showUserPage(vector<User> *users)
 				cin >> password;
 				cin.ignore();
 
-				recUser.push_back(User(username, password, User::Role::Admin, Person::personIdAddOne(recUser.back().getPersonId())));
+				recUser.push_back(User(username, password, User::Role::Admin, "admin"));
 				Save::saveData(&recUser, USERPATH);
 				cout << endl << "Berhasil menambahkan admin!" << endl;
 				cin.ignore();
@@ -238,8 +248,9 @@ void showDepartemenPage(vector<Departemen> *departemens)
 				cout << "-> Kode Departemen: ";
 				getline(cin, kode);
 
-				recDepartemen.push_back(Departemen(name, kode, (recDepartemen.size() > 0) ? Departemen::departemenIdAddOne(recDepartemen.back().getId()) : "d_0"));
+				recDepartemen.push_back(Departemen(name, kode, myData.lastDepartemenIdAddOne()));
 				Save::saveData(&recDepartemen, DEPARTEMENPATH);
+				Save::saveData(&myData, DATAPATH);
 				cout << endl << "Berhasil menambahkan departemen!" << endl;
 				cin.ignore();
 			}
@@ -415,11 +426,12 @@ void showMatkulPage(Departemen *departemen)
 				cin >> matkulSKS;
 				cin.ignore();
 
-				Matkul matkulTemp = Matkul(matkulName, matkulKode, matkulSKS, (recMatkul.size() > 0) ? Matkul::matkulIdAddOne(recMatkul.back().getId()) : "m_0", departemen->getId());
+				Matkul matkulTemp = Matkul(matkulName, matkulKode, matkulSKS, myData.lastMatkulIdAddOne(), departemen->getId());
 				departemen->addMatkul(matkulTemp.getId());
 				recMatkul.push_back(matkulTemp);
 				Save::saveData(&recMatkul, MATKULPATH);
 				Save::saveData(&recDepartemen, DEPARTEMENPATH);
+				Save::saveData(&myData, DATAPATH);
 
 				cout << endl << "Matkul telah ditambahkan!" << endl;
 				cin.ignore();
@@ -548,19 +560,78 @@ void showDetailMatkul(vector<Matkul*> matkuls, Departemen *departemens)
 
 // ==================================================================
 
+void showDosenPage(vector<Dosen> *dosens)
+{
+	int page = 1;
+	char menu;
+	while (1)
+	{
+		Utils::clearScreen();
+		cout << ": Data Dosen" << endl << endl;
+		Utils::printTable<string, string, string>(Dosen::makeTuples(&recDosen, &recDepartemen), Dosen::tuplesHeader(), page);
+		cout << endl;
+		cout << "Menu: " << endl;
+		cout << "  1. Tambah Dosen" << endl;
+		cout << "  2. Hapus Dosen" << endl;
+		cout << "  3. Tampilkan Detail" << endl;
+		if (page <= int((dosens->size() - 1) / 10) && dosens->size() > 0)
+			cout << "  >. Tampilkan Selanjutnya" << endl;
+		if (page > 1)
+			cout << "  <. Tampilkan Sebelumnya" << endl;
+		cout << "  0. Kembali" << endl;
+		cout << "-> Pilihan: ";
+		cin >> menu;
+		cin.ignore();
+
+		switch (menu)
+		{
+		case '0':
+			return;
+		case '1':
+			{
+				if (recDepartemen.size() <= 0)
+				{
+					cout << "\nBelum ada data departemen, buat departemen lebih dahulu!" << endl;
+					cin.ignore();
+					break;
+				}
+				Utils::clearScreen();
+				cout << "Nama Dosen: ";
+				cout << "Nama Dosen: ";
+			}
+			break;
+		case '2':
+			break;
+		case '3':
+			break;
+		case '>':
+			if (page <= int((dosens->size() - 1) / 10) && dosens->size() > 0) page++;
+			break;
+		case '<':
+			if (page > 1) page--;
+			break;
+		default:
+			break;
+		}
+	}
+}
+
+// ==================================================================
+
 
 
 // ==================================================================
 
 int main()
 {
+	Save::loadData(myData, DATAPATH);
 	Save::loadData(recUser, USERPATH);
 	Save::loadData(recDepartemen, DEPARTEMENPATH);
 	Save::loadData(recMatkul, MATKULPATH);
 
 	if (recUser.size() == 0)
 	{
-		recUser.push_back(User("admin", "Admin", User::Role::Admin, "p_0"));
+		recUser.push_back(User("admin", "Admin", User::Role::Admin, "admin"));
 		Save::saveData(&recUser, USERPATH);
 	}
 
