@@ -68,33 +68,21 @@ string Matkul::matkulIdAddOne(string personId)
 	return ss.str();
 }
 
-vector<tuple<string, string, int>> Matkul::makeTuples(vector<Matkul*> *matkuls)
+int Matkul::getPosition(vector<Matkul> *list, Matkul *target)
 {
-    vector<tuple<string, string, int>> tuples;
-    for (unsigned int i = 0; i < matkuls->size(); i++)
-    {
-        tuple<string, string, int> matkul;
-        matkul = make_tuple(matkuls->at(i)->getName(), matkuls->at(i)->getKode(), matkuls->at(i)->getSKS());
-        tuples.push_back(matkul);
-    }
-    return tuples;
+    for (unsigned int i = 0; i < list->size(); i++)
+        if (&list->at(i) == target)
+            return i;
+    cout << "Cannot find position of " << target->getName() << endl;
+    exit(0);
 }
 
-vector<string> Matkul::tuplesHeader(){ return {"Nama Matkul", "Kode", "SKS"}; }
-
-int Matkul::getPosition(vector<Matkul> matkuls, Matkul *target)
+int Matkul::getPosition(vector<Matkul> *list, string id)
 {
-    for (int i = 0; i < int(matkuls.size()); i++)
-        if (matkuls[i].getId() == target->getId())
+    for (int i = 0; i < int(list->size()); i++)
+        if (list->at(i).getId() == id)
             return i;
-    return -1;
-}
-
-int Matkul::getPosition(vector<Matkul> matkuls, string id)
-{
-    for (int i = 0; i < int(matkuls.size()); i++)
-        if (matkuls[i].getId() == id)
-            return i;
-    return -1;
+    cout << "Cannot find position of matkul id: " << id << endl;
+    exit(0);
 }
 // ==================================================================

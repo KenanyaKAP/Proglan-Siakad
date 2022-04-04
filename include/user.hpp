@@ -30,9 +30,8 @@ public:
 
     void changePassword(std::string newPassword);
 
-    static User *getUser(std::vector<User> *users, std::string username);
-    static std::vector<std::tuple<std::string, std::string>> makeTuples(std::vector<User> *users);
-    static std::vector<std::string> tuplesHeader();
+    static User *getUser(std::vector<User> *list, std::string username);
+    static int getPosition(std::vector<User> *list, User *target);
 };
 
 #endif

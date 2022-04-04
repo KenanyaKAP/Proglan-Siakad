@@ -25,9 +25,6 @@ public:
 	std::vector<std::string> getAllKelasAjarId();
 
 	void setPendidikan(int pendidikan);
-
-	static std::vector<std::tuple<std::string, std::string, std::string>> makeTuples(std::vector<Dosen> *dosens, std::vector<Departemen> *departemens);
-    static std::vector<std::string> tuplesHeader();
 };
 
 #endif 

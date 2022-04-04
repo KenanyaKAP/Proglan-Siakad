@@ -49,25 +49,20 @@ void User::changePassword(string newPassword){ this->password = newPassword; }
 
 
 // ===================== Static Public Function =====================
-User *User::getUser(vector<User> *users, string username)
+User *User::getUser(vector<User> *list, string username)
 {
-    for (User &user : *users)
+    for (User &user : *list)
         if (user.getUsername() == username)
             return &user;
     return nullptr;
 }
 
-vector<tuple<string, string>> User::makeTuples(vector<User> *users)
+int User::getPosition(std::vector<User> *list, User *target)
 {
-    vector<tuple<string, string>> tuples;
-    for (unsigned int i = 0; i < users->size(); i++)
-    {
-        tuple<string, string> user;
-        user = make_tuple(users->at(i).getUsername(), users->at(i).getRoleString());
-        tuples.push_back(user);
-    }
-    return tuples;
+    for (unsigned int i = 0; i < list->size(); i++)
+        if (&list->at(i) == target)
+            return i;
+    cout << "Cannot find position of " << target->getUsername() << endl;
+    exit(0);
 }
-
-vector<string> User::tuplesHeader(){ return {"Username", "Role"}; }
 // ==================================================================
