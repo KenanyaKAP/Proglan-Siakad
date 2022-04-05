@@ -11,8 +11,63 @@
 #include "include/user.hpp"
 #include "include/departemen.hpp"
 #include "include/matkul.hpp"
+#include "include/dosen.hpp"
 
 using namespace std;
+
+// ===========================    Data    ===========================
+void Save::saveData(Data *data, const char *path)
+{
+    fstream file;
+    file.open(path, ios::trunc | ios::out | ios::in);
+    if (!file.is_open()){ cout << "Error while opening " << path << "!" << endl; exit(1); }
+
+    file << /*Utils::encrypt*/(data->getLastPersonId()) << '\0';
+    file << /*Utils::encrypt*/(data->getLastDepartemenId()) << '\0';
+    file << /*Utils::encrypt*/(data->getLastMatkulId()) << '\0';
+    file << /*Utils::encrypt*/(to_string(data->getTahunMasuk()->size())) << '\0';
+    for (tuple<string, int> &tahun : *data->getTahunMasuk())
+    {
+        file << /*Utils::encrypt*/(get<0>(tahun)) << '\0';
+        file << /*Utils::encrypt*/(to_string(get<1>(tahun))) << '\0';
+    }
+    file << endl;
+}
+
+void Save::loadData(Data &out, const char *path)
+{
+    fstream file;
+    file.open(path, ios::in);
+    if (!file.is_open())
+    {
+        file.close();
+        file.open(path, ios::trunc | ios::out | ios::in);
+    }
+    if (!file.is_open()){ cout << "Error while opening " << path << "!" << endl; exit(1); }
+
+    string data, temp;
+    if (getline(file, data))
+    {
+        stringstream ssData(/*Utils::decrypt*/(data));
+        vector<string> dataString;
+        while (getline(ssData, temp, '\0'))
+            dataString.push_back(temp);
+        
+        out.setLastPersonId(dataString[0]);
+        out.setLastDepartemenId(dataString[1]);
+        out.setLastMatkulId(dataString[2]);
+
+        vector<tuple<string, int>> temp;
+        for (int i = 4; i < stoi(dataString[3]) * 2 + 4; i += 2)
+        {
+            temp.push_back(make_tuple(dataString[i], stoi(dataString[i + 1])));
+        }
+        out.setTahunMasuk(&temp);
+    }
+}
+// ==================================================================
+
+
 
 // ===========================    User    ===========================
 void Save::saveData(vector<User> *data, const char *path)
@@ -145,20 +200,6 @@ void Save::saveData(vector<Matkul> *data, const char *path)
         for (string &kelasId : *matkul.getAllKelasId())
             file << Utils::encrypt(kelasId) << '\0';
         file << endl;
-
-        // file << Utils::encrypt(dept.getName()) << '\0';
-        // file << Utils::encrypt(dept.getKode()) << '\0';
-        // file << Utils::encrypt(dept.getId()) << '\0';
-        // file << Utils::encrypt(to_string(dept.getAllMatkulId()->size())) << '\0';
-        // for (string &matkulId : *dept.getAllMatkulId())
-        //     file << Utils::encrypt(matkulId) << '\0';
-        // file << Utils::encrypt(to_string(dept.getAllDosenId()->size())) << '\0';
-        // for (string &dosenId : *dept.getAllDosenId())
-        //     file << Utils::encrypt(dosenId) << '\0';
-        // file << Utils::encrypt(to_string(dept.getAllMahasiswaId()->size())) << '\0';
-        // for (string &mhsId : *dept.getAllMahasiswaId())
-        //     file << Utils::encrypt(mhsId) << '\0';
-        // file << endl;
     }
 }
 
@@ -197,19 +238,34 @@ void Save::loadData(vector<Matkul> &out, const char *path)
 
 
 
-// ===========================    Data    ===========================
-void Save::saveData(Data *data, const char *path)
+// ==========================    Dosen    ===========================
+void Save::saveData(vector<Dosen> *data, const char *path)
 {
     fstream file;
     file.open(path, ios::trunc | ios::out | ios::in);
     if (!file.is_open()){ cout << "Error while opening " << path << "!" << endl; exit(1); }
 
-    file << Utils::encrypt(data->getLastPersonId()) << '\0';
-    file << Utils::encrypt(data->getLastDepartemenId()) << '\0';
-    file << Utils::encrypt(data->getLastMatkulId()) << '\n';
+    for (Dosen &dosen : *data)
+    {
+        file << Utils::encrypt(dosen.getId()) << '\0';
+        file << Utils::encrypt(dosen.getName()) << '\0';
+        file << Utils::encrypt(to_string(dosen.getTglLahir())) << '\0';
+        file << Utils::encrypt(to_string(dosen.getBulanLahir())) << '\0';
+        file << Utils::encrypt(to_string(dosen.getTahunLahir())) << '\0';
+        file << Utils::encrypt(dosen.getNPP()) << '\0';
+        file << Utils::encrypt(to_string(dosen.getTahunMasuk())) << '\0';
+        file << Utils::encrypt(dosen.getDepartemenId()) << '\0';
+        file << Utils::encrypt(to_string(dosen.getPendidikan())) << '\0';
+        file << Utils::encrypt(to_string(dosen.getAllKelasAjarId()->size())) << '\0';
+        for (string &kelasId : *dosen.getAllKelasAjarId())
+        {
+            file << Utils::encrypt(kelasId) << '\0';
+        }
+        file << endl;
+    }
 }
 
-void Save::loadData(Data &out, const char *path)
+void Save::loadData(vector<Dosen> &out, const char *path)
 {
     fstream file;
     file.open(path, ios::in);
@@ -220,17 +276,20 @@ void Save::loadData(Data &out, const char *path)
     }
     if (!file.is_open()){ cout << "Error while opening " << path << "!" << endl; exit(1); }
 
-    string data, temp;
-    if (getline(file, data))
+    string data;
+    while (getline(file, data))
     {
+        string temp;
         stringstream ssData(Utils::decrypt(data));
+        
         vector<string> dataString;
         while (getline(ssData, temp, '\0'))
             dataString.push_back(temp);
         
-        out.setLastPersonId(dataString[0]);
-        out.setLastDepartemenId(dataString[1]);
-        out.setLastMatkulId(dataString[2]);
+        Dosen dosen(dataString[0], dataString[1], stoi(dataString[2]), stoi(dataString[3]), stoi(dataString[4]), dataString[5], stoi(dataString[6]), dataString[7], stoi(dataString[8]));
+        for (int i = 10; i < stoi(dataString[9]) + 10; i++)
+            dosen.addKelasAjarId(dataString[i]);
+        out.push_back(dosen);
     }
 }
 // ==================================================================

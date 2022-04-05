@@ -1,8 +1,22 @@
-Saver class (static)
 
-Save(vector<class>, path);
 
-auto data = Load(path);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ===============================================

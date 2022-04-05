@@ -12,6 +12,8 @@ namespace Utils {
     void clearScreen();
     std::string encrypt(std::string input);
     std::string decrypt(std::string input);
+    std::string intToStringMonth(int monthInt);
+
     template <class... T>
     void printTable(std::vector<std::tuple<T...>> data, std::vector<std::string> header, unsigned int page);
 }

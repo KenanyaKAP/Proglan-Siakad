@@ -30,8 +30,12 @@ public:
     void addMahasiswa(std::string id);
     void delMatkul(std::string id);
 
+    static std::vector<std::tuple<std::string, std::string>> makeTuples(std::vector<Departemen> *departemens);
+    static std::vector<std::string> tuplesHeader();
+
 	static std::string departemenIdAddOne(std::string departemenId);
     static int getPosition(std::vector<Departemen> *list, Departemen *target);
+    static Departemen *getDepartemenById(std::vector<Departemen> *list, std::string id);
 };
 
 #endif

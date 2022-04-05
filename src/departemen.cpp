@@ -54,6 +54,20 @@ void Departemen::delMatkul(string id)
 
 
 // ======================== Public Function =========================
+vector<tuple<string, string>> Departemen::makeTuples(vector<Departemen> *departemens)
+{
+    vector<tuple<string, string>> tuples;
+    for (unsigned int i = 0; i < departemens->size(); i++)
+    {
+        tuple<string, string> user;
+        user = make_tuple(departemens->at(i).getName(), departemens->at(i).getKode());
+        tuples.push_back(user);
+    }
+    return tuples;
+}
+
+vector<string> Departemen::tuplesHeader(){ return {"Nama Departemen", "Kode"}; }
+
 string Departemen::departemenIdAddOne(string departemenId)
 {
     departemenId.erase(departemenId.begin(), departemenId.begin() + 2);
@@ -62,12 +76,20 @@ string Departemen::departemenIdAddOne(string departemenId)
 	return ss.str();
 }
 
-int Departemen::getPosition(std::vector<Departemen> *list, Departemen *target)
+int Departemen::getPosition(vector<Departemen> *list, Departemen *target)
 {
     for (unsigned int i = 0; i < list->size(); i++)
         if (&list->at(i) == target)
             return i;
     cout << "Cannot find position of " << target->getName() << endl;
     exit(0);
+}
+
+Departemen *Departemen::getDepartemenById(vector<Departemen> *list, string id)
+{
+    for (Departemen &dept : *list)
+        if (dept.getId() == id)
+            return &dept;
+    return nullptr;
 }
 // ==================================================================
