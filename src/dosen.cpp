@@ -31,19 +31,26 @@ int Dosen::getPendidikan(){ return this->pendidikan; }
 
 vector<string> *Dosen::getAllKelasAjarId(){ return &this->kelasAjarIds; }
 
-void Dosen::setNPP(std::string npp){ this->npp = npp; }
+void Dosen::setNPP(string npp){ this->npp = npp; }
 
 void Dosen::setTahunMasuk(int tahunMasuk){ this->tahunMasuk = tahunMasuk; }
 
-void Dosen::setDepartemenId(std::string departemenId){ this->departemenId = departemenId; }
+void Dosen::setDepartemenId(string departemenId){ this->departemenId = departemenId; }
 
 void Dosen::setPendidikan(int pendidikan){ this->pendidikan = pendidikan; }
 
-void Dosen::addKelasAjarId(std::string kelasId){ this->kelasAjarIds.push_back(kelasId); }
+void Dosen::addKelasAjarId(string kelasId){ this->kelasAjarIds.push_back(kelasId); }
 // ==================================================================
 
 
 
 // ===================== Public Static Function =====================
-
+int Dosen::getPosition(vector<Dosen> *list, Dosen *target)
+{
+    for (unsigned int i = 0; i < list->size(); i++)
+        if (&list->at(i) == target)
+            return i;
+    cout << "Cannot find position of " << target->getName() << endl;
+    exit(0);
+}
 // ==================================================================

@@ -31,6 +31,8 @@ public:
 	void setDepartemenId(std::string departemenId);
 	void setPendidikan(int pendidikan);
 	void addKelasAjarId(std::string kelasId);
+
+	static int getPosition(std::vector<Dosen> *list, Dosen *target);
 };
 
 #endif 

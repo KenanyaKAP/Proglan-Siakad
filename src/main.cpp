@@ -708,7 +708,19 @@ void showDosenPage(vector<Dosen> *dosens)
 				break;
 			case '3':
 				{
+					cout << "Anda yakin ingin menghapus " << dosen.getName() << "?" << endl;
+					cout << "-> [y/n]: ";
+					cin >> menu;
+					cin.ignore();
+					if (menu == 'y' || menu == 'Y')
+					{
+						recDosen.erase(recDosen.begin() + Dosen::getPosition(&recDosen, &dosen));
 
+						Save::saveData(&recDosen, DOSENPATH);
+
+						cout << endl << "Departemen telah dihapus!" << endl;
+						cin.ignore();
+					}
 				}
 				break;
 			case '>':
