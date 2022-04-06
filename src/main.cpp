@@ -14,12 +14,16 @@
 #include "include/departemen.hpp"
 #include "include/matkul.hpp"
 #include "include/dosen.hpp"
+#include "include/tendik.hpp"
+#include "include/mahasiswa.hpp"
 
 #define DATAPATH "data/data.bin"
 #define USERPATH "data/user.bin"
 #define DEPARTEMENPATH "data/departemen.bin"
 #define MATKULPATH "data/matkul.bin"
 #define DOSENPATH "data/dosen.bin"
+#define TENDIKPATH "data/tendik.bin"
+#define MAHASISWAPATH "data/mahasiswa.bin"
 
 using namespace std;
 
@@ -28,20 +32,22 @@ vector<User> recUser;
 vector<Departemen> recDepartemen;
 vector<Matkul> recMatkul;
 vector<Dosen> recDosen;
+vector<Tendik> recTendik;
+vector<Mahasiswa> recMahasiswa;
 
 void adminPage(User *user);
+void dosenPage(Dosen *dosen);
+
 void showUserPage(vector<User> *users);
 void showDepartemenPage(vector<Departemen> *departemens);
 void showMatkulPage(Departemen *departemen);
-void showDosenPage(vector<Dosen> *dosens);
+void showDosenPage(vector<Dosen> *dosens, string departemenId = "\0");
+void showTendikPage(vector<Tendik> *tendiks);
+void showMahasiswaPage(vector<Mahasiswa> *mahasiswas);
 
-void addUser();
-void addDepartemen();
-void addMatkul();
-
-void delUser();
-void delDepartemen();
-void delMatkul();
+void addDosen();
+void addTendik();
+void addMahasiswa();
 
 // ==================================================================	
 
@@ -53,11 +59,12 @@ void adminPage(User *user)
 		Utils::clearScreen();
 		cout << "Welcome, admin!" << endl;
 		cout  << endl;
+		cout << "Data statistik:" << endl;
 		cout << "  1. Jumlah User                  : " << recUser.size() << " User" << endl;
 		cout << "  2. Jumlah Departemen            : " << recDepartemen.size() << " Departemen" << endl;
-		cout << "  3. Jumlah Dosen                 : " << 0 << " Dosen" << endl;
-		cout << "  4. Jumlah Tenaga Kependidikan   : " << 0 << " Tendik" << endl;
-		cout << "  5. Jumlah Mahasiswa             : " << 0 << " Mahasiswa" << endl;
+		cout << "  3. Jumlah Dosen                 : " << recDosen.size() << " Dosen" << endl;
+		cout << "  4. Jumlah Tenaga Kependidikan   : " << recTendik.size() << " Tendik" << endl;
+		cout << "  5. Jumlah Mahasiswa             : " << recMahasiswa.size() << " Mahasiswa" << endl;
 		cout  << endl;
 		cout << "Menu: " << endl;
 		cout << "  1. Tampilkan User" << endl;
@@ -82,6 +89,12 @@ void adminPage(User *user)
 			break;
 		case '3':
 			showDosenPage(&recDosen);
+			break;
+		case '4':
+			showTendikPage(&recTendik);
+			break;
+		case '5':
+			showMahasiswaPage(&recMahasiswa);
 			break;
 		case '9':
 			{
@@ -118,6 +131,32 @@ void adminPage(User *user)
 
 // ==================================================================
 
+void dosenPage(Dosen *dosen)
+{
+	char menu;
+	while (1)
+	{
+		Utils::clearScreen();
+		cout << "Welcome Dosen: " << dosen->getName() << "!" << endl;
+		cout << endl << "COMING SOON!" << endl << endl;
+		cout << "Menu: " << endl;
+		cout << "  0. Kembali" << endl;
+		cout << "-> Pilihan: ";
+		cin >> menu;
+		cin.ignore();
+
+		switch (menu)
+		{
+		case '0':
+			return;
+		default:
+			break;
+		}
+	}
+}
+
+// ==================================================================
+
 void showUserPage(vector<User> *users)
 {
 	int index = 0;
@@ -128,7 +167,22 @@ void showUserPage(vector<User> *users)
 		User &user = users->at(index);
 		cout << ": Data User" << endl << endl;
 		cout << "-----------------------------------------------" << endl;
-		cout << " " << index + 1 << "/" << users->size() << "\t" << user.getUsername() << endl;
+		cout << " " << index + 1 << "/" << users->size() << "\t";
+		switch (user.getRole())
+		{
+		case User::Role::Dosen:
+			cout << Dosen::getDosenById(&recDosen, user.getPersonId())->getName() << endl;
+			break;
+		case User::Role::Tendik:
+			cout << Tendik::getTendikById(&recTendik, user.getPersonId())->getName() << endl;
+			break;
+		case User::Role::Mahasiswa:
+			cout << Mahasiswa::getMahasiswaById(&recMahasiswa, user.getPersonId())->getName() << endl;
+			break;
+		default:
+			cout << user.getUsername() << endl;
+			break;
+		}
 		cout << "-----------------------------------------------" << endl;
 		cout << "Username	: " << user.getUsername() << endl;
 		cout << "Role		: " << user.getRoleString() << endl;
@@ -183,7 +237,6 @@ void showUserPage(vector<User> *users)
 					cout << endl << "User telah dihapus!" << endl;
 					cin.ignore();
 				}
-				break;
 			}
 			break;
 		case '>':
@@ -281,8 +334,15 @@ void showDepartemenPage(vector<Departemen> *departemens)
 				showMatkulPage(&departemen);
 				break;
 			case '2':
+				{
+					vector<Dosen> dosenDepartemen = Dosen::getAllDosenByDepartemenId(&recDosen, departemen.getId());
+					showDosenPage(&dosenDepartemen);
+				}
 				break;
 			case '3':
+				{
+
+				}
 				break;
 			case '4':
 				{
@@ -407,7 +467,7 @@ void showMatkulPage(Departemen *departemen)
 			cout << "-----------------------------------------------" << endl;
 			cout << endl;
 			cout << "Menu:" << endl;
-			cout << "  1. Tampilkan Semua Pengampu" << endl;								////
+			cout << "  1. Tampilkan Semua Pengampu" << endl; ////
 			cout << "  2. Tambah Mata Kuliah" << endl;
 			cout << "  3. Hapus Mata Kuliah ini" << endl;
 			if (index + 1 < int(matkuls.size()))
@@ -486,10 +546,15 @@ void showMatkulPage(Departemen *departemen)
 
 // ==================================================================
 
-void showDosenPage(vector<Dosen> *dosens)
+void showDosenPage(vector<Dosen> *dosens, string departemenId)
 {
 	int index = 0;
 	char menu;
+
+	if (departemenId != "\0")
+	{
+		
+	}
 
 	while (1)
 	{
@@ -509,84 +574,7 @@ void showDosenPage(vector<Dosen> *dosens)
 			case '0':
 				return;
 			case '1':
-				{
-					if (recDepartemen.size() == 0)
-					{
-						Utils::clearScreen();
-						cout << "Data Departemen Tidak Ditemukan!" << endl;
-						cout << "Silahkan membuat Departemen terlebih dahulu!" << endl;
-						cin.ignore();
-						break;
-					}
-
-					string name, departemenId, npp;
-					int page = 1, dd, mm, yy, tahunMasuk, pendidikan;
-					string menu;
-					while (1)
-					{
-						Utils::clearScreen();
-						Utils::printTable<string, string>(Departemen::makeTuples(&recDepartemen), Departemen::tuplesHeader(), page);
-						cout << endl;
-						cout << "Menu: " << endl;
-						cout << " 1~10. Pilih departemen dosen" << endl;
-						if (page <= int((recDepartemen.size() - 1) / 10) && recDepartemen.size() > 0)
-							cout << "    >. Tampilkan Selanjutnya" << endl;
-						if (page > 1)
-							cout << "    <. Tampilkan Sebelumnya" << endl;
-						cout << "-> Pilihan: ";
-						cin >> menu;
-						cin.ignore();
-
-						if (menu == ">" && page <= int((recDepartemen.size() - 1) / 10) && recDepartemen.size() > 0) page++;
-						else if (menu == "<" && page > 1) page--;
-						else {
-							int select;
-							stringstream temp(menu);
-							temp >> select;
-							if (select > 10 * (page - 1) && select <= 10 * page && select <= (int)recDepartemen.size())
-							{
-								departemenId = recDepartemen.at(select - 1).getId();
-								break;
-							}
-						}
-					}
-					Utils::clearScreen();
-					cout << "Nama Dosen     : ";
-					getline(cin, name);
-					cout << "Tanggal Lahir  : ";
-					cin >> dd;
-					cout << "Bulah Lahir    : ";
-					cin >> mm;
-					cout << "Tahun Lahir    : ";
-					cin >> yy;
-					cout << "Tahun Masuk    : ";
-					cin >> tahunMasuk;
-					cout << "Pendidikan     : S";
-					cin >> pendidikan;
-					cin.ignore();
-					char strTemp[4];
-					stringstream ss;
-					sprintf(strTemp, "%04d", yy);
-					ss << strTemp;
-					sprintf(strTemp, "%02d", mm);
-					ss << strTemp;
-					sprintf(strTemp, "%02d", dd);
-					ss << strTemp;
-					sprintf(strTemp, "%02d", tahunMasuk);
-					ss << strTemp;
-					sprintf(strTemp, "%03d", myData.tahunCount(to_string(tahunMasuk)));
-					ss << strTemp;
-					npp = ss.str();
-					Dosen newDosen(myData.lastPersonIdAddOne(), name, dd, mm, yy, npp, tahunMasuk, departemenId, pendidikan);
-					recDosen.push_back(newDosen);
-					Departemen::getDepartemenById(&recDepartemen, departemenId)->addDosen(newDosen.getId());
-					Save::saveData(&recDosen, DOSENPATH);
-					Save::saveData(&recDepartemen, DEPARTEMENPATH);
-					Save::saveData(&myData, DATAPATH);
-
-					cout << "Dosen berhasil dibuat!" << endl;
-					cin.ignore();
-				}
+				addDosen();
 				break;
 			default:
 				break;
@@ -608,7 +596,7 @@ void showDosenPage(vector<Dosen> *dosens)
 			cout << "-----------------------------------------------" << endl;
 			cout << endl;
 			cout << "Menu:" << endl;
-			cout << "  1. Tampilkan Semua Kuliah Ajar" << endl;
+			cout << "  1. Tampilkan Semua Kuliah Ajar" << endl; ////
 			cout << "  2. Tambah Dosen" << endl;
 			cout << "  3. Hapus Dosen ini" << endl;
 			if (index + 1 < int(dosens->size()))
@@ -627,98 +615,25 @@ void showDosenPage(vector<Dosen> *dosens)
 			case '1':
 				break;
 			case '2':
-				{
-					if (recDepartemen.size() == 0)
-					{
-						Utils::clearScreen();
-						cout << "Data Departemen Tidak Ditemukan!" << endl;
-						cout << "Silahkan membuat Departemen terlebih dahulu!" << endl;
-						cin.ignore();
-						break;
-					}
-
-					string name, departemenId, npp;
-					int page = 1, dd, mm, yy, tahunMasuk, pendidikan;
-					string menu;
-					while (1)
-					{
-						Utils::clearScreen();
-						Utils::printTable<string, string>(Departemen::makeTuples(&recDepartemen), Departemen::tuplesHeader(), page);
-						cout << endl;
-						cout << "Menu: " << endl;
-						cout << " 1~10. Pilih departemen dosen" << endl;
-						if (page <= int((recDepartemen.size() - 1) / 10) && recDepartemen.size() > 0)
-							cout << "    >. Tampilkan Selanjutnya" << endl;
-						if (page > 1)
-							cout << "    <. Tampilkan Sebelumnya" << endl;
-						cout << "-> Pilihan: ";
-						cin >> menu;
-						cin.ignore();
-
-						if (menu == ">" && page <= int((recDepartemen.size() - 1) / 10) && recDepartemen.size() > 0) page++;
-						else if (menu == "<" && page > 1) page--;
-						else {
-							int select;
-							stringstream temp(menu);
-							temp >> select;
-							if (select > 10 * (page - 1) && select <= 10 * page && select <= (int)recDepartemen.size())
-							{
-								departemenId = recDepartemen.at(select - 1).getId();
-								break;
-							}
-						}
-					}
-					Utils::clearScreen();
-					cout << "Nama Dosen     : ";
-					getline(cin, name);
-					cout << "Tanggal Lahir  : ";
-					cin >> dd;
-					cout << "Bulah Lahir    : ";
-					cin >> mm;
-					cout << "Tahun Lahir    : ";
-					cin >> yy;
-					cout << "Tahun Masuk    : ";
-					cin >> tahunMasuk;
-					cout << "Pendidikan     : S";
-					cin >> pendidikan;
-					cin.ignore();
-					char strTemp[4];
-					stringstream ss;
-					sprintf(strTemp, "%04d", yy);
-					ss << strTemp;
-					sprintf(strTemp, "%02d", mm);
-					ss << strTemp;
-					sprintf(strTemp, "%02d", dd);
-					ss << strTemp;
-					sprintf(strTemp, "%02d", tahunMasuk);
-					ss << strTemp;
-					sprintf(strTemp, "%03d", myData.tahunCount(to_string(tahunMasuk)));
-					ss << strTemp;
-					npp = ss.str();
-					Dosen newDosen(myData.lastPersonIdAddOne(), name, dd, mm, yy, npp, tahunMasuk, departemenId, pendidikan);
-					recDosen.push_back(newDosen);
-					Departemen::getDepartemenById(&recDepartemen, departemenId)->addDosen(newDosen.getId());
-					Save::saveData(&recDosen, DOSENPATH);
-					Save::saveData(&recDepartemen, DEPARTEMENPATH);
-					Save::saveData(&myData, DATAPATH);
-
-					cout << "Dosen berhasil dibuat!" << endl;
-					cin.ignore();
-				}
+				addDosen();
 				break;
 			case '3':
 				{
-					cout << "Anda yakin ingin menghapus " << dosen.getName() << "?" << endl;
+					cout << endl << "Anda yakin ingin menghapus " << dosen.getName() << "?" << endl;
 					cout << "-> [y/n]: ";
 					cin >> menu;
 					cin.ignore();
 					if (menu == 'y' || menu == 'Y')
 					{
+						recUser.erase(recUser.begin() + User::getPosition(&recUser, dosen.getUser(&recUser)));
+						Departemen::getDepartemenById(&recDepartemen, dosen.getDepartemenId())->delDosen(dosen.getId());
 						recDosen.erase(recDosen.begin() + Dosen::getPosition(&recDosen, &dosen));
 
+						Save::saveData(&recUser, USERPATH);
+						Save::saveData(&recDepartemen, DEPARTEMENPATH);
 						Save::saveData(&recDosen, DOSENPATH);
 
-						cout << endl << "Departemen telah dihapus!" << endl;
+						cout << endl << "Dosen telah dihapus!" << endl;
 						cin.ignore();
 					}
 				}
@@ -740,6 +655,476 @@ void showDosenPage(vector<Dosen> *dosens)
 
 // ==================================================================
 
+void showTendikPage(vector<Tendik> *tendiks)
+{
+	int index = 0;
+	char menu;
+
+	while (1)
+	{
+		if (tendiks->size() == 0)
+		{
+			Utils::clearScreen();
+			cout << ": Data Tendik Tidak Ditemukan" << endl << endl;
+			cout << "Menu: " << endl;
+			cout << "  1. Tambah Tendik" << endl;
+			cout << "  0. Kembali" << endl;
+			cout << "-> Pilihan: ";
+			cin >> menu;
+			cin.ignore();
+
+			switch (menu)
+			{
+			case '0':
+				return;
+			case '1':
+				addTendik();
+				break;
+			default:
+				break;
+			}
+		}
+		else
+		{
+			Tendik &tendik = tendiks->at(index);
+			Utils::clearScreen();
+			cout << ": Data Tendik" << endl << endl;
+			cout << "-----------------------------------------------" << endl;
+			cout << " " << index + 1 << "/" << tendiks->size() << "\t" << tendik.getName() << endl;
+			cout << "-----------------------------------------------" << endl;
+			cout << "NPP                 : " << tendik.getNPP() << endl;
+			cout << "Tanggal Lahir       : " << tendik.getTglLahir() << " " << Utils::intToStringMonth(tendik.getBulanLahir()) << " " << tendik.getTahunLahir() << endl;
+			cout << "Unit                : " << tendik.getUnit() << endl;
+			cout << "-----------------------------------------------" << endl;
+			cout << endl;
+			cout << "Menu:" << endl;
+			cout << "  1. Tambah Tendik" << endl;
+			cout << "  2. Hapus Tendik ini" << endl;
+			if (index + 1 < int(tendiks->size()))
+				cout << "  >. Tampilkan Selanjutnya" << endl;
+			if (index > 0)
+				cout << "  <. Tampilkan Sebelumnya" << endl;
+			cout << "  0. Kembali" << endl;
+			cout << "-> Pilihan: ";
+			cin >> menu;
+			cin.ignore();
+
+			switch (menu)
+			{
+			case '0':
+				return;
+			case '1':
+				addTendik();
+				break;
+			case '2':
+				{
+					cout << endl << "Anda yakin ingin menghapus " << tendik.getName() << "?" << endl;
+					cout << "-> [y/n]: ";
+					cin >> menu;
+					cin.ignore();
+					if (menu == 'y' || menu == 'Y')
+					{
+						recUser.erase(recUser.begin() + User::getPosition(&recUser, tendik.getUser(&recUser)));
+						recTendik.erase(recTendik.begin() + Tendik::getPosition(&recTendik, &tendik));
+
+						Save::saveData(&recUser, USERPATH);
+						Save::saveData(&recTendik, TENDIKPATH);
+
+						cout << endl << "Tendik telah dihapus!" << endl;
+						cin.ignore();
+					}
+				}
+				break;
+			case '>':
+				if (index + 1 < int(tendiks->size())) index++;
+				break;
+			case '<':
+				if (index > 0) index--;
+				break;
+			default:
+				break;
+			}
+		}
+		
+		if ((unsigned int)index >= tendiks->size()) index = tendiks->size() - 1;
+	}
+}
+
+// ==================================================================
+
+void showMahasiswaPage(vector<Mahasiswa> *mahasiswas)
+{
+	int index = 0;
+	char menu;
+
+	while (1)
+	{
+		if (mahasiswas->size() == 0)
+		{
+			Utils::clearScreen();
+			cout << ": Data Mahasiswa Tidak Ditemukan" << endl << endl;
+			cout << "Menu: " << endl;
+			cout << "  1. Tambah Mahasiswa" << endl;
+			cout << "  0. Kembali" << endl;
+			cout << "-> Pilihan: ";
+			cin >> menu;
+			cin.ignore();
+
+			switch (menu)
+			{
+			case '0':
+				return;
+			case '1':
+				addMahasiswa();
+				break;
+			default:
+				break;
+			}
+		}
+		else
+		{
+			Mahasiswa &mahasiswa = mahasiswas->at(index);
+			Utils::clearScreen();
+			cout << ": Data Mahasiswa" << endl << endl;
+			cout << "-----------------------------------------------" << endl;
+			cout << " " << index + 1 << "/" << mahasiswas->size() << "\t" << mahasiswa.getName() << endl;
+			cout << "-----------------------------------------------" << endl;
+			cout << "NRP                 : " << mahasiswa.getNRP() << endl;
+			cout << "Departemen          : " << Departemen::getDepartemenById(&recDepartemen, mahasiswa.getDepartemenId())->getName() << endl;
+			cout << "Dosen Wali          : " << Dosen::getDosenById(&recDosen, mahasiswa.getDoswalId())->getName() << endl;
+			cout << "Tanggal Lahir       : " << mahasiswa.getTglLahir() << " " << Utils::intToStringMonth(mahasiswa.getBulanLahir()) << " " << mahasiswa.getTahunLahir() << endl;
+			cout << "Tahun Masuk         : " << mahasiswa.getTahunMasuk() << endl;
+			cout << "Semester            : " << mahasiswa.getSemester() << endl;
+			cout << "SKS Lulus           : " << mahasiswa.getSKSLulus() << endl;
+			cout << "IPK                 : " << mahasiswa.getIPK() << endl;
+			cout << "-----------------------------------------------" << endl;
+			cout << endl;
+			cout << "Menu:" << endl;
+			cout << "  1. Tambah Mahasiswa" << endl;
+			cout << "  2. Hapus Mahasiswa ini" << endl;
+			if (index + 1 < int(mahasiswas->size()))
+				cout << "  >. Tampilkan Selanjutnya" << endl;
+			if (index > 0)
+				cout << "  <. Tampilkan Sebelumnya" << endl;
+			cout << "  0. Kembali" << endl;
+			cout << "-> Pilihan: ";
+			cin >> menu;
+			cin.ignore();
+
+			switch (menu)
+			{
+			case '0':
+				return;
+			case '1':
+				addMahasiswa();
+				break;
+			case '2':
+				break;
+			case '>':
+				if (index + 1 < int(mahasiswas->size())) index++;
+				break;
+			case '<':
+				if (index > 0) index--;
+				break;
+			default:
+				break;
+			}
+		}
+		
+		if ((unsigned int)index >= mahasiswas->size()) index = mahasiswas->size() - 1;
+	}
+}
+
+// ==================================================================
+
+void addDosen()
+{
+	if (recDepartemen.size() == 0)
+	{
+		Utils::clearScreen();
+		cout << "Data Departemen Tidak Ditemukan!" << endl;
+		cout << "Silahkan membuat Departemen terlebih dahulu!" << endl;
+		cin.ignore();
+		return;
+	}
+
+	string name, departemenId, npp;
+	int page = 1, dd, mm, yy, tahunMasuk, pendidikan;
+	string menu;
+	while (1)
+	{
+		Utils::clearScreen();
+		Utils::printTable<string, string>(Departemen::makeTuples(&recDepartemen), Departemen::tuplesHeader(), page);
+		cout << endl;
+		cout << "Menu: " << endl;
+		cout << " 1~10. Pilih departemen dosen" << endl;
+		if (page <= int((recDepartemen.size() - 1) / 10) && recDepartemen.size() > 0)
+			cout << "    >. Tampilkan Selanjutnya" << endl;
+		if (page > 1)
+			cout << "    <. Tampilkan Sebelumnya" << endl;
+		cout << "-> Pilihan: ";
+		cin >> menu;
+		cin.ignore();
+
+		if (menu == ">" && page <= int((recDepartemen.size() - 1) / 10) && recDepartemen.size() > 0) page++;
+		else if (menu == "<" && page > 1) page--;
+		else {
+			int select;
+			stringstream temp(menu);
+			temp >> select;
+			if (select > 10 * (page - 1) && select <= 10 * page && select <= (int)recDepartemen.size())
+			{
+				departemenId = recDepartemen.at(select - 1).getId();
+				break;
+			}
+		}
+	}
+	Utils::clearScreen();
+	cout << "Nama Dosen     : ";
+	getline(cin, name);
+	cout << "Tanggal Lahir  : ";
+	cin >> dd;
+	cout << "Bulan Lahir    : ";
+	cin >> mm;
+	cout << "Tahun Lahir    : ";
+	cin >> yy;
+	cout << "Tahun Masuk    : ";
+	cin >> tahunMasuk;
+	cout << "Pendidikan     : S";
+	cin >> pendidikan;
+	cin.ignore();
+	char strTemp[5];
+	stringstream ss;
+	sprintf(strTemp, "%04d", yy);
+	ss << strTemp;
+	sprintf(strTemp, "%02d", mm);
+	ss << strTemp;
+	sprintf(strTemp, "%02d", dd);
+	ss << strTemp;
+	sprintf(strTemp, "%04d", tahunMasuk);
+	ss << strTemp;
+	sprintf(strTemp, "%03d", myData.tahunCount(to_string(tahunMasuk)));
+	ss << strTemp;
+	npp = ss.str();
+	Dosen newDosen(myData.lastPersonIdAddOne(), name, dd, mm, yy, npp, tahunMasuk, departemenId, pendidikan);
+	recDosen.push_back(newDosen);
+	Departemen::getDepartemenById(&recDepartemen, departemenId)->addDosen(newDosen.getId());
+	Save::saveData(&recDosen, DOSENPATH);
+	Save::saveData(&recDepartemen, DEPARTEMENPATH);
+	Save::saveData(&myData, DATAPATH);
+
+	cout << endl << "Dosen berhasil dibuat!" << endl;
+
+	ss.str("");
+	sprintf(strTemp, "%02d", dd);
+	ss << strTemp;
+	sprintf(strTemp, "%02d", mm);
+	ss << strTemp;
+	sprintf(strTemp, "%04d", yy);
+	ss << strTemp;
+
+	recUser.push_back(User(newDosen.getNPP(), ss.str(), User::Role::Dosen, newDosen.getId()));
+	Save::saveData(&recUser, USERPATH);
+
+	cout << endl << "User Dosen berhasil dibuat!" << endl;
+	cout << "Username: NPP" << endl;
+	cout << "Password: [ddmmyyyy] tanggal lahir" << endl;
+	cin.ignore();
+}
+
+// ==================================================================
+
+void addTendik()
+{
+	string name, npp, unit;
+	int dd, mm, yy, tahunMasuk;
+	string menu;
+	Utils::clearScreen();
+	cout << "Nama Tendik    : ";
+	getline(cin, name);
+	cout << "Tanggal Lahir  : ";
+	cin >> dd;
+	cout << "Bulan Lahir    : ";
+	cin >> mm;
+	cout << "Tahun Lahir    : ";
+	cin >> yy;
+	cout << "Tahun Masuk    : ";
+	cin >> tahunMasuk;
+	cin.ignore();
+	cout << "Masukkan Unit  : ";
+	getline(cin, unit);
+	char strTemp[5];
+	stringstream ss;
+	sprintf(strTemp, "%04d", yy);
+	ss << strTemp;
+	sprintf(strTemp, "%02d", mm);
+	ss << strTemp;
+	sprintf(strTemp, "%02d", dd);
+	ss << strTemp;
+	sprintf(strTemp, "%04d", tahunMasuk);
+	ss << strTemp;
+	sprintf(strTemp, "%03d", myData.tahunCount(to_string(tahunMasuk)));
+	ss << strTemp;
+	npp = ss.str();
+	Tendik newTendik(myData.lastPersonIdAddOne(), name, dd, mm, yy, npp, tahunMasuk, unit);
+	recTendik.push_back(newTendik);
+
+	Save::saveData(&recTendik, TENDIKPATH);
+	Save::saveData(&myData, DATAPATH);
+
+	cout << endl << "Tendik berhasil dibuat!" << endl;
+
+	ss.str("");
+	sprintf(strTemp, "%02d", dd);
+	ss << strTemp;
+	sprintf(strTemp, "%02d", mm);
+	ss << strTemp;
+	sprintf(strTemp, "%04d", yy);
+	ss << strTemp;
+
+	recUser.push_back(User(newTendik.getNPP(), ss.str(), User::Role::Tendik, newTendik.getId()));
+	Save::saveData(&recUser, USERPATH);
+
+	cout << endl << "User Tendik berhasil dibuat!" << endl;
+	cout << "Username: NPP" << endl;
+	cout << "Password: [ddmmyyyy] tanggal lahir" << endl;
+	cin.ignore();
+}
+
+// ==================================================================
+
+void addMahasiswa()
+{
+	if (recDepartemen.size() == 0)
+	{
+		Utils::clearScreen();
+		cout << "Data Departemen Tidak Ditemukan!" << endl;
+		cout << "Silahkan membuat Departemen terlebih dahulu!" << endl;
+		cin.ignore();
+		return;
+	}
+
+	string name, departemenId, nrp, doswalId;
+	int page = 1, dd, mm, yy, tahunMasuk;
+	string menu;
+	while (1)
+	{
+		Utils::clearScreen();
+		Utils::printTable<string, string>(Departemen::makeTuples(&recDepartemen), Departemen::tuplesHeader(), page);
+		cout << endl;
+		cout << "Menu: " << endl;
+		cout << " 1~10. Pilih departemen mahasiswa" << endl;
+		if (page <= int((recDepartemen.size() - 1) / 10) && recDepartemen.size() > 0)
+			cout << "    >. Tampilkan Selanjutnya" << endl;
+		if (page > 1)
+			cout << "    <. Tampilkan Sebelumnya" << endl;
+		cout << "-> Pilihan: ";
+		cin >> menu;
+		cin.ignore();
+
+		if (menu == ">" && page <= int((recDepartemen.size() - 1) / 10) && recDepartemen.size() > 0) page++;
+		else if (menu == "<" && page > 1) page--;
+		else {
+			int select;
+			stringstream temp(menu);
+			temp >> select;
+			if (select > 10 * (page - 1) && select <= 10 * page && select <= (int)recDepartemen.size())
+			{
+				departemenId = recDepartemen.at(select - 1).getId();
+				break;
+			}
+		}
+	}
+
+	if (Departemen::getDepartemenById(&recDepartemen, departemenId)->getAllDosenId()->size() == 0)
+	{
+		Utils::clearScreen();
+		cout << "Data Dosen Wali Tidak Ditemukan!" << endl;
+		cout << "Silahkan membuat Dosen di Departemen ini terlebih dahulu!" << endl;
+		cin.ignore();
+		return;
+	}
+
+	page = 1;
+	vector<Dosen> dosenDepartemen = Dosen::getAllDosenByDepartemenId(&recDosen, departemenId);
+	while (1)
+	{
+		Utils::clearScreen();
+		Utils::printTable<string, string>(Dosen::makeTuples(&dosenDepartemen), Dosen::tuplesHeader(), page);
+		cout << endl;
+		cout << "Menu: " << endl;
+		cout << " 1~10. Pilih dosen wali" << endl;
+		if (page <= int((dosenDepartemen.size() - 1) / 10) && dosenDepartemen.size() > 0)
+			cout << "    >. Tampilkan Selanjutnya" << endl;
+		if (page > 1)
+			cout << "    <. Tampilkan Sebelumnya" << endl;
+		cout << "-> Pilihan: ";
+		cin >> menu;
+		cin.ignore();
+
+		if (menu == ">" && page <= int((dosenDepartemen.size() - 1) / 10) && dosenDepartemen.size() > 0) page++;
+		else if (menu == "<" && page > 1) page--;
+		else {
+			int select;
+			stringstream temp(menu);
+			temp >> select;
+			if (select > 10 * (page - 1) && select <= 10 * page && select <= (int)dosenDepartemen.size())
+			{
+				doswalId = dosenDepartemen.at(select - 1).getId();
+				break;
+			}
+		}
+	}
+
+	Utils::clearScreen();
+	cout << "Nama Mahasiswa : ";
+	getline(cin, name);
+	cout << "Tanggal Lahir  : ";
+	cin >> dd;
+	cout << "Bulan Lahir    : ";
+	cin >> mm;
+	cout << "Tahun Lahir    : ";
+	cin >> yy;
+	cout << "Tahun Masuk    : ";
+	cin >> tahunMasuk;
+	cin.ignore();
+	char strTemp[5];
+	stringstream ss;
+	ss << Departemen::getDepartemenById(&recDepartemen, departemenId)->getKode();
+	tahunMasuk = tahunMasuk % 100;
+	ss << tahunMasuk;
+	ss << 1;
+	sprintf(strTemp, "%03d", Departemen::getDepartemenById(&recDepartemen, departemenId)->getAllMahasiswaId()->size() + 1);
+	ss << strTemp;
+	nrp = ss.str();
+	Mahasiswa newMahasiswa(myData.lastPersonIdAddOne(), name, dd, mm, yy, nrp, departemenId, doswalId, tahunMasuk);
+	recMahasiswa.push_back(newMahasiswa);
+	Departemen::getDepartemenById(&recDepartemen, departemenId)->addMahasiswa(newMahasiswa.getId());
+	Save::saveData(&recMahasiswa, MAHASISWAPATH);
+	Save::saveData(&recDepartemen, DEPARTEMENPATH);
+	Save::saveData(&myData, DATAPATH);
+
+	cout << endl << "Mahasiswa berhasil dibuat!" << endl; 
+
+	ss.str("");
+	sprintf(strTemp, "%02d", dd);
+	ss << strTemp;
+	sprintf(strTemp, "%02d", mm);
+	ss << strTemp;
+	sprintf(strTemp, "%04d", yy);
+	ss << strTemp;
+
+	recUser.push_back(User(newMahasiswa.getNRP(), ss.str(), User::Role::Mahasiswa, newMahasiswa.getId()));
+	Save::saveData(&recUser, USERPATH);
+
+	cout << endl << "User Dosen berhasil dibuat!" << endl;
+	cout << "Username: NPP" << endl;
+	cout << "Password: [ddmmyyyy] tanggal lahir" << endl;
+	cin.ignore();
+}
+
+// ==================================================================
+
 int main()
 {
 	Save::loadData(myData, DATAPATH);
@@ -747,6 +1132,8 @@ int main()
 	Save::loadData(recDepartemen, DEPARTEMENPATH);
 	Save::loadData(recMatkul, MATKULPATH);
 	Save::loadData(recDosen, DOSENPATH);
+	Save::loadData(recTendik, TENDIKPATH);
+	Save::loadData(recMahasiswa, MAHASISWAPATH);
 
 	if (recUser.size() == 0)
 	{
@@ -765,6 +1152,9 @@ int main()
 		cout << "|____/|_|\\__,_|_|\\_\\__,_|\\__,_|" << endl;
 		cout << endl;
 		cout << "by Kenanya Keandra 5024_004" << endl;
+		cout << "Default:" << endl;
+		cout << "Username: admin" << endl;
+		cout << "Password: Admin" << endl;
 		cout << endl;
 		cout << endl;
 		cout << "-> Username: ";
@@ -782,8 +1172,7 @@ int main()
 					adminPage(user);
 					break;
 				case 1:
-					cout << "You r Dosen\n";
-					cin.ignore();
+					dosenPage(Dosen::getDosenById(&recDosen, user->getPersonId()));
 					break;
 				case 2:
 					cout << "You r Tendik\n";

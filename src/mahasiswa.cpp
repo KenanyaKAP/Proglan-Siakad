@@ -6,8 +6,8 @@
 using namespace std;
 
 // ========================== Constructor ===========================
-Mahasiswa::Mahasiswa(string id, string nama, int dd, int mm, int yy, string nrp, string departemenId, int tahunMasuk)
-:Person(id, nama, dd, mm, yy), nrp(nrp), departemenId(departemenId), tahunMasuk(tahunMasuk)
+Mahasiswa::Mahasiswa(string id, string nama, int dd, int mm, int yy, string nrp, string departemenId, string doswalId, int tahunMasuk)
+:Person(id, nama, dd, mm, yy), nrp(nrp), departemenId(departemenId), doswalId(doswalId), tahunMasuk(tahunMasuk)
 {
 	this->ipk = 0.0;
 	this->semester = 1;
@@ -28,6 +28,8 @@ std::string Mahasiswa::getNRP(){ return this->nrp; }
 
 std::string Mahasiswa::getDepartemenId(){ return this->departemenId; }
 
+std::string Mahasiswa::getDoswalId(){ return this->doswalId; }
+
 int Mahasiswa::getTahunMasuk(){ return this->tahunMasuk; }
 
 int Mahasiswa::getSemester(){ return this->semester; }
@@ -46,13 +48,24 @@ void Mahasiswa::setSKSLulus(int sksLulus){ this->sksLulus = sksLulus; }
 
 void Mahasiswa::setIPS(int semester, float ips)
 { 
-	this->ips[semester] = ips;
+	this->ips[semester - 1] = ips;
 
-	// Hitung IPK 
+	float temp = 0;
+	for (float i : this->ips)
+		temp += i;
+	this->ipk = temp / this->ips.size();
 }
 // ==================================================================
 
 
 
 // ===================== Public Static Function =====================
+Mahasiswa *Mahasiswa::getMahasiswaById(vector<Mahasiswa> *list, string personId)
+{
+    for (unsigned int i = 0; i < list->size(); i++)
+        if (list->at(i).getId() == personId)
+            return &list->at(i);
+    cout << "NULLLLLLLARRRRRRRR";
+    return nullptr;
+}
 // ==================================================================

@@ -7,7 +7,7 @@
 
 #include "include/person.hpp"
 
-class Departemen;
+class User;
 
 class Dosen : public Person {
 private:
@@ -25,6 +25,7 @@ public:
 	std::string getDepartemenId();
 	int getPendidikan();
 	std::vector<std::string> *getAllKelasAjarId();
+	User *getUser(std::vector<User> *list);
 
 	void setNPP(std::string npp);
 	void setTahunMasuk(int tahunMasuk);
@@ -33,6 +34,10 @@ public:
 	void addKelasAjarId(std::string kelasId);
 
 	static int getPosition(std::vector<Dosen> *list, Dosen *target);
+	static Dosen *getDosenById(std::vector<Dosen> *list, std::string personId);
+	static std::vector<std::tuple<std::string, std::string>> makeTuples(std::vector<Dosen> *dosens);
+    static std::vector<std::string> tuplesHeader();
+	static std::vector<Dosen> getAllDosenByDepartemenId(std::vector<Dosen> *list, std::string id);
 };
 
 #endif 

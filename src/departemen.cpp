@@ -49,6 +49,18 @@ void Departemen::delMatkul(string id)
         }
     }
 }
+
+void Departemen::delDosen(string id)
+{
+    for (unsigned int i = 0; i < dosenIds.size(); i++)
+    {
+        if (dosenIds[i] == id)
+        {
+            dosenIds.erase(dosenIds.begin() + i);
+            return;
+        }
+    }
+}
 // ==================================================================
 
 

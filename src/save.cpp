@@ -12,6 +12,8 @@
 #include "include/departemen.hpp"
 #include "include/matkul.hpp"
 #include "include/dosen.hpp"
+#include "include/tendik.hpp"
+#include "include/mahasiswa.hpp"
 
 using namespace std;
 
@@ -22,14 +24,14 @@ void Save::saveData(Data *data, const char *path)
     file.open(path, ios::trunc | ios::out | ios::in);
     if (!file.is_open()){ cout << "Error while opening " << path << "!" << endl; exit(1); }
 
-    file << /*Utils::encrypt*/(data->getLastPersonId()) << '\0';
-    file << /*Utils::encrypt*/(data->getLastDepartemenId()) << '\0';
-    file << /*Utils::encrypt*/(data->getLastMatkulId()) << '\0';
-    file << /*Utils::encrypt*/(to_string(data->getTahunMasuk()->size())) << '\0';
+    file << Utils::encrypt(data->getLastPersonId()) << '\0';
+    file << Utils::encrypt(data->getLastDepartemenId()) << '\0';
+    file << Utils::encrypt(data->getLastMatkulId()) << '\0';
+    file << Utils::encrypt(to_string(data->getTahunMasuk()->size())) << '\0';
     for (tuple<string, int> &tahun : *data->getTahunMasuk())
     {
-        file << /*Utils::encrypt*/(get<0>(tahun)) << '\0';
-        file << /*Utils::encrypt*/(to_string(get<1>(tahun))) << '\0';
+        file << Utils::encrypt(get<0>(tahun)) << '\0';
+        file << Utils::encrypt(to_string(get<1>(tahun))) << '\0';
     }
     file << endl;
 }
@@ -48,7 +50,7 @@ void Save::loadData(Data &out, const char *path)
     string data, temp;
     if (getline(file, data))
     {
-        stringstream ssData(/*Utils::decrypt*/(data));
+        stringstream ssData(Utils::decrypt(data));
         vector<string> dataString;
         while (getline(ssData, temp, '\0'))
             dataString.push_back(temp);
@@ -290,6 +292,119 @@ void Save::loadData(vector<Dosen> &out, const char *path)
         for (int i = 10; i < stoi(dataString[9]) + 10; i++)
             dosen.addKelasAjarId(dataString[i]);
         out.push_back(dosen);
+    }
+}
+// ==================================================================
+
+
+
+// ==========================    TENDIK    ==========================
+void Save::saveData(vector<Tendik> *data, const char *path)
+{
+    fstream file;
+    file.open(path, ios::trunc | ios::out | ios::in);
+    if (!file.is_open()){ cout << "Error while opening " << path << "!" << endl; exit(1); }
+
+    for (Tendik &tendik : *data)
+    {
+        file << Utils::encrypt(tendik.getId()) << '\0';
+        file << Utils::encrypt(tendik.getName()) << '\0';
+        file << Utils::encrypt(to_string(tendik.getTglLahir())) << '\0';
+        file << Utils::encrypt(to_string(tendik.getBulanLahir())) << '\0';
+        file << Utils::encrypt(to_string(tendik.getTahunLahir())) << '\0';
+        file << Utils::encrypt(tendik.getNPP()) << '\0';
+        file << Utils::encrypt(to_string(tendik.getTahunMasuk())) << '\0';
+        file << Utils::encrypt(tendik.getUnit()) << '\n';
+    }
+}
+
+void Save::loadData(vector<Tendik> &out, const char *path)
+{
+    fstream file;
+    file.open(path, ios::in);
+    if (!file.is_open())
+    {
+        file.close();
+        file.open(path, ios::trunc | ios::out | ios::in);
+    }
+    if (!file.is_open()){ cout << "Error while opening " << path << "!" << endl; exit(1); }
+
+    string data;
+    while (getline(file, data))
+    {
+        string temp;
+        stringstream ssData(Utils::decrypt(data));
+        
+        vector<string> dataString;
+        while (getline(ssData, temp, '\0'))
+            dataString.push_back(temp);
+        
+        Tendik tendik(dataString[0], dataString[1], stoi(dataString[2]), stoi(dataString[3]), stoi(dataString[4]), dataString[5], stoi(dataString[6]), dataString[7]);
+        out.push_back(tendik);
+    }
+}
+// ==================================================================
+
+
+
+// =========================    Mahasiswa    ========================
+void Save::saveData(vector<Mahasiswa> *data, const char *path)
+{
+    fstream file;
+    file.open(path, ios::trunc | ios::out | ios::in);
+    if (!file.is_open()){ cout << "Error while opening " << path << "!" << endl; exit(1); }
+
+    for (Mahasiswa &mahasiswa : *data)
+    {
+        file << Utils::encrypt(mahasiswa.getId()) << '\0';
+        file << Utils::encrypt(mahasiswa.getName()) << '\0';
+        file << Utils::encrypt(to_string(mahasiswa.getTglLahir())) << '\0';
+        file << Utils::encrypt(to_string(mahasiswa.getBulanLahir())) << '\0';
+        file << Utils::encrypt(to_string(mahasiswa.getTahunLahir())) << '\0';
+        file << Utils::encrypt(mahasiswa.getNRP()) << '\0';
+        file << Utils::encrypt(mahasiswa.getDepartemenId()) << '\0';
+        file << Utils::encrypt(mahasiswa.getDoswalId()) << '\0';
+        file << Utils::encrypt(to_string(mahasiswa.getTahunMasuk())) << '\0';
+        file << Utils::encrypt(to_string(mahasiswa.getSemester())) << '\0';
+        file << Utils::encrypt(to_string(mahasiswa.getSKSLulus())) << '\0';
+        file << Utils::encrypt(to_string(mahasiswa.getIPK())) << '\0';
+        file << Utils::encrypt(to_string(mahasiswa.getAllIPS()->size())) << '\0';
+        for (float &ips : *mahasiswa.getAllIPS())
+        {
+            file << Utils::encrypt(to_string(ips)) << '\0';
+        }
+        file << endl;
+    }
+}
+
+void Save::loadData(vector<Mahasiswa> &out, const char *path)
+{
+    fstream file;
+    file.open(path, ios::in);
+    if (!file.is_open())
+    {
+        file.close();
+        file.open(path, ios::trunc | ios::out | ios::in);
+    }
+    if (!file.is_open()){ cout << "Error while opening " << path << "!" << endl; exit(1); }
+
+    string data;
+    while (getline(file, data))
+    {
+        string temp;
+        stringstream ssData(Utils::decrypt(data));
+        
+        vector<string> dataString;
+        while (getline(ssData, temp, '\0'))
+            dataString.push_back(temp);
+        
+        Mahasiswa mahasiswa(dataString[0], dataString[1], stoi(dataString[2]), stoi(dataString[3]), stoi(dataString[4]), dataString[5], dataString[6], dataString[7], stoi(dataString[8]));
+        mahasiswa.setSemester(stoi(dataString[9]));
+        mahasiswa.setSKSLulus(stoi(dataString[10]));
+        for (int i = 12; i < stoi(dataString[11]) + 12; i++)
+            mahasiswa.setIPS(i - 11, stof(dataString[i]));
+
+        out.push_back(mahasiswa);
     }
 }
 // ==================================================================
