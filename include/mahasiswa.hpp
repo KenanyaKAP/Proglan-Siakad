@@ -5,6 +5,8 @@
 
 #include "include/person.hpp"
 
+class User;
+
 class Mahasiswa : public Person {
 private:
 	std::string nrp;
@@ -28,12 +30,15 @@ public:
 	float getIPK();
 	float getIPS(int semester);
 	std::vector<float> *getAllIPS();
+	User *getUser(std::vector<User> *list);
 
 	void setSemester(int semester);
 	void setSKSLulus(int sksLulus);
 	void setIPS(int semester, float ips);
 
+	static int getPosition(std::vector<Mahasiswa> *list, Mahasiswa *target);
 	static Mahasiswa *getMahasiswaById(std::vector<Mahasiswa> *list, std::string id);
+	static std::vector<Mahasiswa> getAllMahasiswaByDepartemenId(std::vector<Mahasiswa> *list, std::string id);
 };
 
 #endif

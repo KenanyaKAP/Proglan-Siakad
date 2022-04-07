@@ -71,7 +71,7 @@ string Matkul::matkulIdAddOne(string personId)
 int Matkul::getPosition(vector<Matkul> *list, Matkul *target)
 {
     for (unsigned int i = 0; i < list->size(); i++)
-        if (&list->at(i) == target)
+        if (list->at(i).getId() == target->getId())
             return i;
     cout << "Cannot find position of " << target->getName() << endl;
     exit(0);

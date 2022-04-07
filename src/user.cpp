@@ -60,7 +60,7 @@ User *User::getUser(vector<User> *list, string username)
 int User::getPosition(std::vector<User> *list, User *target)
 {
     for (unsigned int i = 0; i < list->size(); i++)
-        if (&list->at(i) == target)
+        if (list->at(i).getPersonId() == target->getPersonId())
             return i;
     cout << "Cannot find position of " << target->getUsername() << endl;
     exit(0);

@@ -30,6 +30,7 @@ public:
     void addMahasiswa(std::string id);
     void delMatkul(std::string id);
     void delDosen(std::string id);
+    void delMahasiswa(std::string id);
 
     static std::vector<std::tuple<std::string, std::string>> makeTuples(std::vector<Departemen> *departemens);
     static std::vector<std::string> tuplesHeader();

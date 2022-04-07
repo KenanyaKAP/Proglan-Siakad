@@ -61,6 +61,18 @@ void Departemen::delDosen(string id)
         }
     }
 }
+
+void Departemen::delMahasiswa(string id)
+{
+    for (unsigned int i = 0; i < mahasiswaIds.size(); i++)
+    {
+        if (mahasiswaIds[i] == id)
+        {
+            mahasiswaIds.erase(mahasiswaIds.begin() + i);
+            return;
+        }
+    }
+}
 // ==================================================================
 
 
@@ -91,7 +103,7 @@ string Departemen::departemenIdAddOne(string departemenId)
 int Departemen::getPosition(vector<Departemen> *list, Departemen *target)
 {
     for (unsigned int i = 0; i < list->size(); i++)
-        if (&list->at(i) == target)
+        if (list->at(i).getId() == target->getId())
             return i;
     cout << "Cannot find position of " << target->getName() << endl;
     exit(0);

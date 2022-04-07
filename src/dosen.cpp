@@ -57,7 +57,7 @@ void Dosen::addKelasAjarId(string kelasId){ this->kelasAjarIds.push_back(kelasId
 int Dosen::getPosition(vector<Dosen> *list, Dosen *target)
 {
     for (unsigned int i = 0; i < list->size(); i++)
-        if (&list->at(i) == target)
+        if (list->at(i).getId() == target->getId())
             return i;
     cout << "Cannot find position of " << target->getName() << endl;
     exit(0);

@@ -2,6 +2,7 @@
 #include <vector>
 
 #include "include/mahasiswa.hpp"
+#include "include/user.hpp"
 
 using namespace std;
 
@@ -42,6 +43,14 @@ float Mahasiswa::getIPS(int semester){ return this->ips.at(semester); }
 
 std::vector<float> *Mahasiswa::getAllIPS(){ return &this->ips; }
 
+User *Mahasiswa::getUser(vector<User> *list)
+{
+    for (User &user : *list)
+        if(user.getPersonId() == this->getId())
+            return &user;
+    return nullptr;
+}
+
 void Mahasiswa::setSemester(int semester){ this->semester = semester; }
 
 void Mahasiswa::setSKSLulus(int sksLulus){ this->sksLulus = sksLulus; }
@@ -60,6 +69,15 @@ void Mahasiswa::setIPS(int semester, float ips)
 
 
 // ===================== Public Static Function =====================
+int Mahasiswa::getPosition(vector<Mahasiswa> *list, Mahasiswa *target)
+{
+    for (unsigned int i = 0; i < list->size(); i++)
+        if (list->at(i).getId() == target->getId())
+            return i;
+    cout << "Cannot find position of " << target->getName() << endl;
+    exit(0);
+}
+
 Mahasiswa *Mahasiswa::getMahasiswaById(vector<Mahasiswa> *list, string personId)
 {
     for (unsigned int i = 0; i < list->size(); i++)
@@ -67,5 +85,14 @@ Mahasiswa *Mahasiswa::getMahasiswaById(vector<Mahasiswa> *list, string personId)
             return &list->at(i);
     cout << "NULLLLLLLARRRRRRRR";
     return nullptr;
+}
+
+vector<Mahasiswa> Mahasiswa::getAllMahasiswaByDepartemenId(vector<Mahasiswa> *list, string id)
+{
+    vector<Mahasiswa> output;
+    for (Mahasiswa &mahasiswa : *list)
+        if (mahasiswa.getDepartemenId() == id)
+            output.push_back(mahasiswa);
+    return output;
 }
 // ==================================================================
