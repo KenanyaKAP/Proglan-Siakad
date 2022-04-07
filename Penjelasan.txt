@@ -1,0 +1,10 @@
+///////////// Laporan Sederhana /////////////
+
+Dari program awal/base yang sudah diberikan, banyak hal telah diubah.
+
+- Mengubah tampilan program
+- Menambahkan sistem user login page, sehingga admin, tendik, dosen, dan mahasiswa bisa memiliki tampilannya sendiri-sendiri. (Hanya page admin yang sudah selesai)
+- Menambahkan class Data, Departemen, dan Matkul
+- Class Data digunakan untuk menyimpan id terakhir dari instance class yang sudah pernah dibuat
+- Class Departemen berisi daftar mata kuliah yang ada di departemen tersebut, serta dosen dan mahasiswanya
+- Menambahkan fitur save, data dari semua instance yang sudah ditambahkan ke program akan disimpan dan akan di load kembali saat program dijalankan
