@@ -7,29 +7,40 @@
 
 struct Data {
 private:
+    int semester;
+    std::string lastAdminId;
     std::string lastPersonId;
     std::string lastDepartemenId;
     std::string lastMatkulId;
-    std::vector<std::tuple<std::string, int>> dosenTahunMasuk;
+    std::vector<std::tuple<std::string, int>> dosenId;
+    std::vector<std::tuple<std::string, int>> mahasiswaId;
 
 public:
     Data();
 
+    int getSemester();
+    std::string getLastAdminId();
     std::string getLastPersonId();
     std::string getLastDepartemenId();
     std::string getLastMatkulId();
-    std::vector<std::tuple<std::string, int>> *getTahunMasuk();
+    std::vector<std::tuple<std::string, int>> *getDosenId();
+    std::vector<std::tuple<std::string, int>> *getMahasiswaId();
     
+    void setSemester(int semester);
+    void setLastAdminId(std::string last);
     void setLastPersonId(std::string last);
     void setLastDepartemenId(std::string last);
     void setLastMatkulId(std::string last);
-    void setTahunMasuk(std::vector<std::tuple<std::string, int>> *data);
+    void setDosenId(std::vector<std::tuple<std::string, int>> *data);
+    void setMahasiswaId(std::vector<std::tuple<std::string, int>> *data);
 
+    std::string lastAdminIdAddOne();
     std::string lastPersonIdAddOne();
     std::string lastDepartemenIdAddOne();
     std::string lastMatkulIdAddOne();
 
-    int tahunCount(std::string tahun);
+    int dosenIdCount(std::string tahun);
+    int mahasiswaIdCount(std::string departemenId);
 };
 
 #endif

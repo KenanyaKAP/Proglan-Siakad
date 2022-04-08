@@ -25,7 +25,7 @@ public:
 	void setTahunMasuk(int tahunMasuk);
 	void setUnit(std::string unit);
 
-	static int getPosition(std::vector<Tendik> *list, Tendik *target);
+	static int getPositionById(std::vector<Tendik> *list, std::string id);
 	static Tendik *getTendikById(std::vector<Tendik> *list, std::string id);
 };
 

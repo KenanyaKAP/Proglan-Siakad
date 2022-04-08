@@ -8,3 +8,6 @@ Dari program awal/base yang sudah diberikan, banyak hal telah diubah.
 - Class Data digunakan untuk menyimpan id terakhir dari instance class yang sudah pernah dibuat
 - Class Departemen berisi daftar mata kuliah yang ada di departemen tersebut, serta dosen dan mahasiswanya
 - Menambahkan fitur save, data dari semua instance yang sudah ditambahkan ke program akan disimpan dan akan di load kembali saat program dijalankan
+
+
+Jelasin aja semua fitur yang ada di program ini

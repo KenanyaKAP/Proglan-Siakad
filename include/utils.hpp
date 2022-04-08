@@ -8,18 +8,23 @@
 
 #include "include/VariadicTable.hpp"
 
+using namespace std;
+
 namespace Utils {
     void clearScreen();
-    std::string encrypt(std::string input);
-    std::string decrypt(std::string input);
-    std::string intToStringMonth(int monthInt);
+    string encrypt(string input);
+    string decrypt(string input);
+    string intToStringMonth(int monthInt);
 
     template <class... T>
-    void printTable(std::vector<std::tuple<T...>> data, std::vector<std::string> header, unsigned int page);
+    void printTable(vector<tuple<T...>> data, vector<string> header, unsigned int page);
+
+    template <class T>
+    vector<T*> makeVectorPointer(vector<T> *input);
 }
 
 template <class... T>
-void Utils::printTable(std::vector<std::tuple<T...>> data, std::vector<std::string> header, unsigned int page)
+void Utils::printTable(vector<tuple<T...>> data, vector<string> header, unsigned int page)
 {
     header.insert(header.begin(), "No");
     VariadicTable<int, T...> vt(header);
@@ -27,11 +32,20 @@ void Utils::printTable(std::vector<std::tuple<T...>> data, std::vector<std::stri
     {
         if (i < data.size())
         {
-            vt.addRow(std::tuple_cat(std::make_tuple(i+1), data[i]));
+            vt.addRow(tuple_cat(make_tuple(i+1), data[i]));
         }
     }
     
-    vt.print(std::cout);
+    vt.print(cout);
+}
+
+template <class T>
+vector<T*> Utils::makeVectorPointer(vector<T> *input)
+{
+    vector<T*> output;
+    for (T &element : *input)
+        output.push_back(&element);
+    return output;
 }
 
 #endif

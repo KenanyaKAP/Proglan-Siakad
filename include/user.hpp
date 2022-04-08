@@ -30,8 +30,8 @@ public:
 
     void changePassword(std::string newPassword);
 
-    static User *getUser(std::vector<User> *list, std::string username);
-    static int getPosition(std::vector<User> *list, User *target);
+    static int getPositionById(std::vector<User> *list, std::string id);
+    static User *getUserByUname(std::vector<User> *list, std::string username);
 };
 
 #endif

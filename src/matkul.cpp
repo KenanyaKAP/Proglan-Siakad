@@ -43,41 +43,24 @@ void Matkul::addKelas(string id){ this->kelasId.push_back(id); }
 
 
 // ===================== Public Static Function =====================
-vector<Matkul*> Matkul::getMatkulsByDepartemenId(vector<Matkul> *matkuls, string departemenId)
+vector<Matkul*> Matkul::getMatkulsByDeptId(vector<Matkul> *list, string id)
 {
     vector<Matkul*> output;
-
-    for (Matkul &matkul : *matkuls)
-        if (matkul.getDepartemenId() == departemenId)
+    for (Matkul &matkul : *list)
+        if (matkul.getDepartemenId() == id)
             output.push_back(&matkul);
-
     return output;
 }
 
-int Matkul::getMatkulIdInt(string personId)
+string Matkul::matkulIdAddOne(string id)
 {
-	personId.erase(personId.begin(), personId.begin() + 2);
-	return stoi(personId);
-}
-
-string Matkul::matkulIdAddOne(string personId)
-{
-	personId.erase(personId.begin(), personId.begin() + 2);
+	id.erase(id.begin(), id.begin() + 2);
 	stringstream ss;
-	ss << "m_" << stoi(personId) + 1;
+	ss << "m_" << stoi(id) + 1;
 	return ss.str();
 }
 
-int Matkul::getPosition(vector<Matkul> *list, Matkul *target)
-{
-    for (unsigned int i = 0; i < list->size(); i++)
-        if (list->at(i).getId() == target->getId())
-            return i;
-    cout << "Cannot find position of " << target->getName() << endl;
-    exit(0);
-}
-
-int Matkul::getPosition(vector<Matkul> *list, string id)
+int Matkul::getPositionById(vector<Matkul> *list, string id)
 {
     for (int i = 0; i < int(list->size()); i++)
         if (list->at(i).getId() == id)

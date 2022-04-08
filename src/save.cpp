@@ -24,11 +24,13 @@ void Save::saveData(Data *data, const char *path)
     file.open(path, ios::trunc | ios::out | ios::in);
     if (!file.is_open()){ cout << "Error while opening " << path << "!" << endl; exit(1); }
 
+    file << Utils::encrypt(to_string(data->getSemester())) << '\0';
+    file << Utils::encrypt(data->getLastAdminId()) << '\0';
     file << Utils::encrypt(data->getLastPersonId()) << '\0';
     file << Utils::encrypt(data->getLastDepartemenId()) << '\0';
     file << Utils::encrypt(data->getLastMatkulId()) << '\0';
-    file << Utils::encrypt(to_string(data->getTahunMasuk()->size())) << '\0';
-    for (tuple<string, int> &tahun : *data->getTahunMasuk())
+    file << Utils::encrypt(to_string(data->getDosenId()->size())) << '\0';
+    for (tuple<string, int> &tahun : *data->getDosenId())
     {
         file << Utils::encrypt(get<0>(tahun)) << '\0';
         file << Utils::encrypt(to_string(get<1>(tahun))) << '\0';
@@ -55,16 +57,18 @@ void Save::loadData(Data &out, const char *path)
         while (getline(ssData, temp, '\0'))
             dataString.push_back(temp);
         
-        out.setLastPersonId(dataString[0]);
-        out.setLastDepartemenId(dataString[1]);
-        out.setLastMatkulId(dataString[2]);
+        out.setSemester(stoi(dataString[0]));
+        out.setLastAdminId(dataString[1]);
+        out.setLastPersonId(dataString[2]);
+        out.setLastDepartemenId(dataString[3]);
+        out.setLastMatkulId(dataString[4]);
 
         vector<tuple<string, int>> temp;
-        for (int i = 4; i < stoi(dataString[3]) * 2 + 4; i += 2)
+        for (int i = 6; i < stoi(dataString[5]) * 2 + 6; i += 2)
         {
             temp.push_back(make_tuple(dataString[i], stoi(dataString[i + 1])));
         }
-        out.setTahunMasuk(&temp);
+        out.setDosenId(&temp);
     }
 }
 // ==================================================================
@@ -263,6 +267,11 @@ void Save::saveData(vector<Dosen> *data, const char *path)
         {
             file << Utils::encrypt(kelasId) << '\0';
         }
+        file << Utils::encrypt(to_string(dosen.getAllMahasiswaWaliId()->size())) << '\0';
+        for (string &mahasiswaId : *dosen.getAllMahasiswaWaliId())
+        {
+            file << Utils::encrypt(mahasiswaId) << '\0';
+        }
         file << endl;
     }
 }
@@ -289,8 +298,12 @@ void Save::loadData(vector<Dosen> &out, const char *path)
             dataString.push_back(temp);
         
         Dosen dosen(dataString[0], dataString[1], stoi(dataString[2]), stoi(dataString[3]), stoi(dataString[4]), dataString[5], stoi(dataString[6]), dataString[7], stoi(dataString[8]));
-        for (int i = 10; i < stoi(dataString[9]) + 10; i++)
+        int v1 = 9;
+        int v2 = 10 + stoi(dataString[v1]);
+        for (int i = v1 + 1; i < v2; i++)
             dosen.addKelasAjarId(dataString[i]);
+        for (int i = v2 + 1; i < v2 + 1 + stoi(dataString[v2]); i++)
+            dosen.addMahasiswaWaliId(dataString[i]);
         out.push_back(dosen);
     }
 }

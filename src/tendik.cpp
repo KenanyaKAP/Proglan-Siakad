@@ -43,12 +43,12 @@ User *Tendik::getUser(vector<User> *list)
 
 
 // ===================== Public Static Function =====================
-int Tendik::getPosition(vector<Tendik> *list, Tendik *target)
+int Tendik::getPositionById(vector<Tendik> *list, string id)
 {
     for (unsigned int i = 0; i < list->size(); i++)
-        if (list->at(i).getId() == target->getId())
+        if (list->at(i).getId() == id)
             return i;
-    cout << "Cannot find position of " << target->getName() << endl;
+    cout << "Cannot find position of: " << id << endl;
     exit(0);
 }
 
@@ -57,7 +57,7 @@ Tendik *Tendik::getTendikById(vector<Tendik> *list, string id)
     for (unsigned int i = 0; i < list->size(); i++)
         if (list->at(i).getId() == id)
             return &list->at(i);
-    cout << "NULLLLLLL";
-    return nullptr;
+    cout << "Cannot find Tendik with id: " << id << endl;
+    exit(0);
 }
 // ==================================================================

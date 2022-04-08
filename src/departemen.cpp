@@ -92,20 +92,20 @@ vector<tuple<string, string>> Departemen::makeTuples(vector<Departemen> *departe
 
 vector<string> Departemen::tuplesHeader(){ return {"Nama Departemen", "Kode"}; }
 
-string Departemen::departemenIdAddOne(string departemenId)
+string Departemen::departemenIdAddOne(string id)
 {
-    departemenId.erase(departemenId.begin(), departemenId.begin() + 2);
+    id.erase(id.begin(), id.begin() + 2);
 	stringstream ss;
-	ss << "d_" << stoi(departemenId) + 1;
+	ss << "d_" << stoi(id) + 1;
 	return ss.str();
 }
 
-int Departemen::getPosition(vector<Departemen> *list, Departemen *target)
+int Departemen::getPositionById(vector<Departemen> *list, string id)
 {
     for (unsigned int i = 0; i < list->size(); i++)
-        if (list->at(i).getId() == target->getId())
+        if (list->at(i).getId() == id)
             return i;
-    cout << "Cannot find position of " << target->getName() << endl;
+    cout << "Cannot find position of: " << id << endl;
     exit(0);
 }
 
@@ -114,6 +114,7 @@ Departemen *Departemen::getDepartemenById(vector<Departemen> *list, string id)
     for (Departemen &dept : *list)
         if (dept.getId() == id)
             return &dept;
-    return nullptr;
+    cout << "Cannot find Departemen with id: " << id << endl;
+    exit(0);
 }
 // ==================================================================

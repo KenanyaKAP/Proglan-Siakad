@@ -49,20 +49,20 @@ void User::changePassword(string newPassword){ this->password = newPassword; }
 
 
 // ===================== Static Public Function =====================
-User *User::getUser(vector<User> *list, string username)
+int User::getPositionById(std::vector<User> *list, string id)
+{
+    for (unsigned int i = 0; i < list->size(); i++)
+        if (list->at(i).getPersonId() == id)
+            return i;
+    cout << "Cannot find position of: " << id << endl;
+    exit(0);
+}
+
+User *User::getUserByUname(vector<User> *list, string username)
 {
     for (User &user : *list)
         if (user.getUsername() == username)
             return &user;
     return nullptr;
-}
-
-int User::getPosition(std::vector<User> *list, User *target)
-{
-    for (unsigned int i = 0; i < list->size(); i++)
-        if (list->at(i).getPersonId() == target->getPersonId())
-            return i;
-    cout << "Cannot find position of " << target->getUsername() << endl;
-    exit(0);
 }
 // ==================================================================

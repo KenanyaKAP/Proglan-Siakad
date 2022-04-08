@@ -16,6 +16,7 @@ private:
 	std::string departemenId;
 	int pendidikan;
 	std::vector<std::string> kelasAjarIds;
+	std::vector<std::string> mahasiswaWaliIds;
 
 public:
 	Dosen(std::string id, std::string name, int dd, int mm, int yy, std::string npp, int tahunMasuk, std::string departemenId, int pendidikan);
@@ -25,6 +26,7 @@ public:
 	std::string getDepartemenId();
 	int getPendidikan();
 	std::vector<std::string> *getAllKelasAjarId();
+	std::vector<std::string> *getAllMahasiswaWaliId();
 	User *getUser(std::vector<User> *list);
 
 	void setNPP(std::string npp);
@@ -32,12 +34,15 @@ public:
 	void setDepartemenId(std::string departemenId);
 	void setPendidikan(int pendidikan);
 	void addKelasAjarId(std::string kelasId);
+	void addMahasiswaWaliId(std::string mahasiswaId);
+	void delMahasiswaWaliId(std::string mahasiswaId);
 
-	static int getPosition(std::vector<Dosen> *list, Dosen *target);
-	static Dosen *getDosenById(std::vector<Dosen> *list, std::string personId);
-	static std::vector<std::tuple<std::string, std::string>> makeTuples(std::vector<Dosen> *dosens);
+	static int getPositionById(std::vector<Dosen> *list, std::string id);
+	static Dosen *getDosenById(std::vector<Dosen> *list, std::string id);
+	static std::vector<std::tuple<std::string, std::string>> makeTuples(std::vector<Dosen> *list);
+	static std::vector<std::tuple<std::string, std::string>> makeTuples(std::vector<Dosen*> *list);
     static std::vector<std::string> tuplesHeader();
-	static std::vector<Dosen> getAllDosenByDepartemenId(std::vector<Dosen> *list, std::string id);
+	static std::vector<Dosen*> getDosensByDeptId(std::vector<Dosen> *list, std::string id);
 };
 
 #endif 

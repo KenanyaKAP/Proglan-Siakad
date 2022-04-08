@@ -21,8 +21,7 @@ public:
 	void setName(std::string name);
 	void setTglLahir(int dd, int mm, int yy);
 
-	static int getPersonIdInt(std::string personId);
-	static std::string personIdAddOne(std::string personId);
+	static std::string personIdAddOne(std::string personId, const char *prefix);
 };
 
 #endif

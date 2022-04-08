@@ -28,11 +28,9 @@ public:
     void addDosen(std::string id);
     void addKelas(std::string id);
 
-    static std::vector<Matkul*> getMatkulsByDepartemenId(std::vector<Matkul> *matkuls, std::string departemenId);
-    static int getMatkulIdInt(std::string matkulId);
-	static std::string matkulIdAddOne(std::string matkulId);
-    static int getPosition(std::vector<Matkul> *list, Matkul *target);
-    static int getPosition(std::vector<Matkul> *list, std::string id);
+    static std::vector<Matkul*> getMatkulsByDeptId(std::vector<Matkul> *list, std::string id);
+	static std::string matkulIdAddOne(std::string id);
+    static int getPositionById(std::vector<Matkul> *list, std::string id);
 };
 
 #endif

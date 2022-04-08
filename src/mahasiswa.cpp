@@ -25,11 +25,11 @@ Mahasiswa::Mahasiswa(string id, string nama, int dd, int mm, int yy, string nrp,
 
 
 // ======================== Public Function =========================
-std::string Mahasiswa::getNRP(){ return this->nrp; }
+string Mahasiswa::getNRP(){ return this->nrp; }
 
-std::string Mahasiswa::getDepartemenId(){ return this->departemenId; }
+string Mahasiswa::getDepartemenId(){ return this->departemenId; }
 
-std::string Mahasiswa::getDoswalId(){ return this->doswalId; }
+string Mahasiswa::getDoswalId(){ return this->doswalId; }
 
 int Mahasiswa::getTahunMasuk(){ return this->tahunMasuk; }
 
@@ -41,7 +41,7 @@ float Mahasiswa::getIPK(){ return this->ipk; }
 
 float Mahasiswa::getIPS(int semester){ return this->ips.at(semester); }
 
-std::vector<float> *Mahasiswa::getAllIPS(){ return &this->ips; }
+vector<float> *Mahasiswa::getAllIPS(){ return &this->ips; }
 
 User *Mahasiswa::getUser(vector<User> *list)
 {
@@ -64,35 +64,40 @@ void Mahasiswa::setIPS(int semester, float ips)
 		temp += i;
 	this->ipk = temp / this->ips.size();
 }
+
+void Mahasiswa::setDoswalId(string id)
+{
+    this->doswalId = id;
+}
 // ==================================================================
 
 
 
 // ===================== Public Static Function =====================
-int Mahasiswa::getPosition(vector<Mahasiswa> *list, Mahasiswa *target)
+int Mahasiswa::getPositionById(vector<Mahasiswa> *list, string id)
 {
     for (unsigned int i = 0; i < list->size(); i++)
-        if (list->at(i).getId() == target->getId())
+        if (list->at(i).getId() == id)
             return i;
-    cout << "Cannot find position of " << target->getName() << endl;
+    cout << "Cannot find position of: " << id << endl;
     exit(0);
 }
 
-Mahasiswa *Mahasiswa::getMahasiswaById(vector<Mahasiswa> *list, string personId)
+Mahasiswa *Mahasiswa::getMahasiswaById(vector<Mahasiswa> *list, string id)
 {
     for (unsigned int i = 0; i < list->size(); i++)
-        if (list->at(i).getId() == personId)
+        if (list->at(i).getId() == id)
             return &list->at(i);
-    cout << "NULLLLLLLARRRRRRRR";
-    return nullptr;
+    cout << "Cannot find Mahasiswa with id: " << id << endl;
+    exit(0);
 }
 
-vector<Mahasiswa> Mahasiswa::getAllMahasiswaByDepartemenId(vector<Mahasiswa> *list, string id)
+vector<Mahasiswa*> Mahasiswa::getMahasiswasByDeptId(vector<Mahasiswa> *list, string id)
 {
-    vector<Mahasiswa> output;
+    vector<Mahasiswa*> output;
     for (Mahasiswa &mahasiswa : *list)
         if (mahasiswa.getDepartemenId() == id)
-            output.push_back(mahasiswa);
+            output.push_back(&mahasiswa);
     return output;
 }
 // ==================================================================

@@ -35,10 +35,11 @@ public:
 	void setSemester(int semester);
 	void setSKSLulus(int sksLulus);
 	void setIPS(int semester, float ips);
+	void setDoswalId(std::string id);
 
-	static int getPosition(std::vector<Mahasiswa> *list, Mahasiswa *target);
+	static int getPositionById(std::vector<Mahasiswa> *list, std::string id);
 	static Mahasiswa *getMahasiswaById(std::vector<Mahasiswa> *list, std::string id);
-	static std::vector<Mahasiswa> getAllMahasiswaByDepartemenId(std::vector<Mahasiswa> *list, std::string id);
+	static std::vector<Mahasiswa*> getMahasiswasByDeptId(std::vector<Mahasiswa> *list, std::string id);
 };
 
 #endif

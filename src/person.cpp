@@ -42,17 +42,11 @@ void Person::setTglLahir(int dd, int mm, int yy)
 
 
 // ===================== Public Static Function =====================
-int Person::getPersonIdInt(string personId)
-{
-	personId.erase(personId.begin(), personId.begin() + 2);
-	return stoi(personId);
-}
-
-string Person::personIdAddOne(string personId)
+string Person::personIdAddOne(string personId, const char *prefix)
 {
 	personId.erase(personId.begin(), personId.begin() + 2);
 	stringstream ss;
-	ss << "p_" << stoi(personId) + 1;
+	ss << prefix << stoi(personId) + 1;
 	return ss.str();
 }
 // ==================================================================
