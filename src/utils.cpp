@@ -1,9 +1,10 @@
 #include <iostream>
 #include <string>
+#include <conio.h>
 
 #include "include/utils.hpp"
 
-#define ENCRYPTCOUNT 3727
+#define ENCRYPTCOUNT 333
 
 using namespace std;
 
@@ -60,4 +61,41 @@ string Utils::intToStringMonth(int monthInt)
     default:
         return "-";
     }
+}
+
+string Utils::takePassword()
+{
+    char pass[1000];
+    int i = 0;
+    char a;
+    while(true)
+    {
+        a = getch();
+        if(a == '\b' && i >= 1)
+        {
+            cout << "\b \b";
+            --i;
+        }
+        else if(a == '\r')
+        {
+            pass[i] = '\0';
+            break;
+        }
+        else if (a == 3)
+        {
+            exit(0);
+        }
+        else /*if((a>='a'&&a<='z') || (a>='A'&&a<='Z') || (a>='0'&&a<='9'))*/
+        {
+            pass[i] = a;
+            ++i;
+            cout << "*";
+        }
+    }
+    cout << endl;
+    return string(pass);
+
+    // string temp;
+    // cin >> temp;
+    // return temp;
 }

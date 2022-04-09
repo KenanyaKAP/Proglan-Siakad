@@ -30,14 +30,6 @@ int Matkul::getSKS(){ return this->sks; }
 string Matkul::getId(){ return this->id; }
 
 string Matkul::getDepartemenId(){ return this->departemenId; }
-
-vector<string> *Matkul::getAllKelasId(){ return &this->kelasId; }
-
-vector<string> *Matkul::getAllDosenId(){ return &this->dosenId; }
-
-void Matkul::addDosen(string id){ this->dosenId.push_back(id); }
-
-void Matkul::addKelas(string id){ this->kelasId.push_back(id); }
 // ==================================================================
 
 

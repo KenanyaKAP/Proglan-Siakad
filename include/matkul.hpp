@@ -11,8 +11,6 @@ private:
     int sks;
     std::string id;
     std::string departemenId;
-    std::vector<std::string> dosenId;
-    std::vector<std::string> kelasId;
 
 public:
     Matkul(std::string name, std::string kode, int sks, std::string id, std::string departemenId);
@@ -22,12 +20,7 @@ public:
     int getSKS();
     std::string getId();
     std::string getDepartemenId();
-    std::vector<std::string> *getAllDosenId();
-    std::vector<std::string> *getAllKelasId();
-
-    void addDosen(std::string id);
-    void addKelas(std::string id);
-
+    
     static std::vector<Matkul*> getMatkulsByDeptId(std::vector<Matkul> *list, std::string id);
 	static std::string matkulIdAddOne(std::string id);
     static int getPositionById(std::vector<Matkul> *list, std::string id);

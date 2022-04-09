@@ -25,15 +25,22 @@ void Save::saveData(Data *data, const char *path)
     if (!file.is_open()){ cout << "Error while opening " << path << "!" << endl; exit(1); }
 
     file << Utils::encrypt(to_string(data->getSemester())) << '\0';
+    file << Utils::encrypt(to_string(data->getMasaFRS())) << '\0';
     file << Utils::encrypt(data->getLastAdminId()) << '\0';
     file << Utils::encrypt(data->getLastPersonId()) << '\0';
     file << Utils::encrypt(data->getLastDepartemenId()) << '\0';
     file << Utils::encrypt(data->getLastMatkulId()) << '\0';
     file << Utils::encrypt(to_string(data->getDosenId()->size())) << '\0';
-    for (tuple<string, int> &tahun : *data->getDosenId())
+    for (tuple<string, int> &dosen : *data->getDosenId())
     {
-        file << Utils::encrypt(get<0>(tahun)) << '\0';
-        file << Utils::encrypt(to_string(get<1>(tahun))) << '\0';
+        file << Utils::encrypt(get<0>(dosen)) << '\0';
+        file << Utils::encrypt(to_string(get<1>(dosen))) << '\0';
+    }
+    file << Utils::encrypt(to_string(data->getMahasiswaId()->size())) << '\0';
+    for (tuple<string, int> &mahasiswa : *data->getMahasiswaId())
+    {
+        file << Utils::encrypt(get<0>(mahasiswa)) << '\0';
+        file << Utils::encrypt(to_string(get<1>(mahasiswa))) << '\0';
     }
     file << endl;
 }
@@ -58,17 +65,25 @@ void Save::loadData(Data &out, const char *path)
             dataString.push_back(temp);
         
         out.setSemester(stoi(dataString[0]));
-        out.setLastAdminId(dataString[1]);
-        out.setLastPersonId(dataString[2]);
-        out.setLastDepartemenId(dataString[3]);
-        out.setLastMatkulId(dataString[4]);
+        out.setMasaFRS((Data::MasaFRS)stoi(dataString[1]));
+        out.setLastAdminId(dataString[2]);
+        out.setLastPersonId(dataString[3]);
+        out.setLastDepartemenId(dataString[4]);
+        out.setLastMatkulId(dataString[5]);
 
+        int v1 = 6;
+        int v2 = 7 + stoi(dataString[v1]) * 2;
         vector<tuple<string, int>> temp;
-        for (int i = 6; i < stoi(dataString[5]) * 2 + 6; i += 2)
+        for (int i = v1 + 1; i < v2; i += 2)
         {
             temp.push_back(make_tuple(dataString[i], stoi(dataString[i + 1])));
         }
         out.setDosenId(&temp);
+        for (int i = v2 + 1; i < v2 + 1 + stoi(dataString[v2]) * 2; i += 2)
+        {
+            temp.push_back(make_tuple(dataString[i], stoi(dataString[i + 1])));
+        }
+        out.setMahasiswaId(&temp);
     }
 }
 // ==================================================================
@@ -198,14 +213,7 @@ void Save::saveData(vector<Matkul> *data, const char *path)
         file << Utils::encrypt(matkul.getKode()) << '\0';
         file << Utils::encrypt(to_string(matkul.getSKS())) << '\0';
         file << Utils::encrypt(matkul.getId()) << '\0';
-        file << Utils::encrypt(matkul.getDepartemenId()) << '\0';
-        file << Utils::encrypt(to_string(matkul.getAllDosenId()->size())) << '\0';
-        for (string &dosenId : *matkul.getAllDosenId())
-            file << Utils::encrypt(dosenId) << '\0';
-        file << Utils::encrypt(to_string(matkul.getAllKelasId()->size())) << '\0';
-        for (string &kelasId : *matkul.getAllKelasId())
-            file << Utils::encrypt(kelasId) << '\0';
-        file << endl;
+        file << Utils::encrypt(matkul.getDepartemenId()) << endl;
     }
 }
 
@@ -231,12 +239,6 @@ void Save::loadData(vector<Matkul> &out, const char *path)
             dataString.push_back(temp);
         
         Matkul matkul(dataString[0], dataString[1], stoi(dataString[2]), dataString[3], dataString[4]);
-        int v1 = 5;
-        int v2 = 6 + stoi(dataString[v1]);
-        for (int i = v1 + 1; i < v2; i++)
-            matkul.addDosen(dataString[i]);
-        for (int i = v2 + 1; i < v2 + stoi(dataString[v2]) + 1; i++)
-            matkul.addKelas(dataString[i]);
         out.push_back(matkul);
     }
 }

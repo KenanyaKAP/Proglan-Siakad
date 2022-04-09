@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <conio.h>
 
 #include "include/utils.hpp"
 #include "include/save.hpp"
@@ -37,9 +38,10 @@ vector<Mahasiswa> recMahasiswa;
 void adminPage(User *user);
 void adminMenuPage();
 void dosenPage(Dosen *dosen);
-
+void showMatkulPage(Departemen *departemen);
 void showUserPage();
 void showDepartemenPage();
+
 void showDosenPage(string deptId = "\0");
 void showTendikPage();
 void showMahasiswaPage(string deptId = "\0");
@@ -71,8 +73,8 @@ void adminPage(User *user)
 		cout << "  3. Tampilkan Dosen" << endl;
 		cout << "  4. Tampilkan Tenaga Kependidikan" << endl;
 		cout << "  5. Tampilkan Mahasiswa" << endl;
-		cout << "  8. Ganti password" << endl;
-		cout << "  9. |Menu Admin|" << endl;
+		cout << "  8. |Menu Admin|" << endl;
+		cout << "  9. Ganti password" << endl;
 		cout << "  0. Log out" << endl;
 		cout << "-> Pilihan: ";
 		cin >> menu;
@@ -97,16 +99,18 @@ void adminPage(User *user)
 			showMahasiswaPage();
 			break;
 		case '8':
+			adminMenuPage();
+			break;
+		case '9':
 			{
 				Utils::clearScreen();
 				string oldPass, newPass, reNewPass;
 				cout << "Password lama:\n-> ";
-				cin >> oldPass;
+				oldPass = Utils::takePassword();
 				cout << "Password baru:\n-> ";
-				cin >> newPass;
+				newPass = Utils::takePassword();
 				cout << "Ketik ulang password baru:\n-> ";
-				cin >> reNewPass;
-				cin.ignore();
+				reNewPass = Utils::takePassword();
 
 				if (user->getPassword() == oldPass)
 				{
@@ -122,9 +126,6 @@ void adminPage(User *user)
 				cout << endl << "Password tidak sama!" << endl;
 				cin.ignore();
 			}
-			break;
-		case '9':
-			adminMenuPage();
 			break;
 		default:
 			break;
@@ -143,7 +144,7 @@ void adminMenuPage()
 		Utils::clearScreen();
 		cout << ": Halaman Menu Admin" << endl << endl;
 		cout << "Menu: " << endl;
-		cout << "  1. Ubah Semester Pendidikan" << endl;
+		cout << "  1. Ubah Masa Pendidikan" << endl;
 		cout << "  0. Kembali" << endl;
 		cout << "-> Pilihan: ";
 		cin >> menu;
@@ -156,15 +157,34 @@ void adminMenuPage()
 			case '1':
 				{
 					Utils::clearScreen();
-					cout << "Semester saat ini " << myData.getSemester() << endl;
-					cout << "Anda yakin ingin mengubah semester menjadi " << myData.getSemester() + 1 << " ?" << endl;
+					cout << "Awal >> Pengisian FRS >> Pelaksanaan Semester >> Ganti Semester" << endl << endl;
+					cout << "Masa FRS : " << myData.getMasaFRSString() << endl;
+					cout << "Semester : " << myData.getSemester() << endl;
+					if (myData.getMasaFRS() == 0)
+						cout << "Ubah masa FRS ke Pengisian ?" << endl;
+					else if (myData.getMasaFRS() == 1)
+						cout << "Akhiri masa Pengisian FRS ?" << endl;
+					else if (myData.getMasaFRS() == 2)
+						cout << "Ubah menjadi semester " << myData.getSemester() + 1 << " ?" << endl;
 					cout << "-> [y/n]: ";
 					cin >> menu;
 					cin.ignore();
 
 					if (menu == 'Y' || menu == 'y')
 					{
-						////
+						if (myData.getMasaFRS() == 0)
+						{
+							myData.setMasaFRS(Data::MasaFRS::Isi);
+							Save::saveData(&myData, DATAPATH);
+						}
+						else if (myData.getMasaFRS() == 1)
+						{
+							
+						}
+						else if (myData.getMasaFRS() == 2)
+						{
+
+						}
 					}
 				}
 				break;
@@ -185,8 +205,11 @@ void dosenPage(Dosen *dosen)
 		Utils::clearScreen();
 		cout << "Selamat datang " << dosen->getName() << "!" << endl << endl;
 		cout << "Menu: " << endl;
-		cout << "  1. Ubah password" << endl;
+		cout << "  1. Setujui FRS" << endl;
+		cout << "  2. Setujui FRS" << endl;
+		cout << "  9. Ubah password" << endl;
 		cout << "  0. Log out" << endl;
+		cout << "-> Pilihan: ";
 		cin >> menu;
 		cin.ignore();
 
@@ -196,15 +219,30 @@ void dosenPage(Dosen *dosen)
 			return;
 		case '1':
 			{
+				if (myData.getMasaFRS() == 0)
+				{
+					cout << myData.getMasaFRSString() << "!" << endl;
+					cin.ignore();
+					break;
+				}
+
+			}
+			break;
+		case '2':
+			{
+				
+			}
+			break;
+		case '9':
+			{
 				Utils::clearScreen();
 				string oldPass, newPass, reNewPass;
 				cout << "Password lama:\n-> ";
-				cin >> oldPass;
+				oldPass = Utils::takePassword();
 				cout << "Password baru:\n-> ";
-				cin >> newPass;
+				newPass = Utils::takePassword();
 				cout << "Ketik ulang password baru:\n-> ";
-				cin >> reNewPass;
-				cin.ignore();
+				reNewPass = Utils::takePassword();
 
 				User *user = User::getUserByUname(&recUser, dosen->getNPP());
 
@@ -406,7 +444,7 @@ void showDepartemenPage()
 			case '0':
 				return;
 			case '1':
-				// showMatkulPage(&departemen);
+				showMatkulPage(&departemen);
 				break;
 			case '2':
 				showDosenPage(departemen.getId());
@@ -470,7 +508,144 @@ void showDepartemenPage()
 
 // ==================================================================
 
-// MATKUL MATKUL MATKUL MATKUL MATKUL MATKUL MATKUL MATKUL MATKUL
+void showMatkulPage(Departemen *departemen)
+{
+	int index = 0;
+	char menu;
+
+	while (1)
+	{
+		vector<Matkul*> matkuls = Matkul::getMatkulsByDeptId(&recMatkul, departemen->getId());
+
+		if (matkuls.size() == 0)
+		{
+			Utils::clearScreen();
+			cout << ": Data Mata Kuliah Departemen " << departemen->getName() << " Tidak Ditemukan" << endl << endl;
+			cout << "Menu: " << endl;
+			cout << "  1. Tambah Mata Kuliah" << endl;
+			cout << "  0. Kembali" << endl;
+			cout << "-> Pilihan: ";
+			cin >> menu;
+			cin.ignore();
+
+			switch (menu)
+			{
+			case '0':
+				return;
+			case '1':
+				{
+					string matkulName, matkulKode;
+					int matkulSKS;
+					Utils::clearScreen();
+					cout << "Nama mata kuliah   : ";
+					getline(cin, matkulName);
+					cout << "Kode mata kuliah   : ";
+					getline(cin, matkulKode);
+					cout << "SKS mata kuliah    : ";
+					cin >> matkulSKS;
+					cin.ignore();
+
+					Matkul matkulTemp = Matkul(matkulName, matkulKode, matkulSKS, myData.lastMatkulIdAddOne(), departemen->getId());
+					departemen->addMatkul(matkulTemp.getId());
+					recMatkul.push_back(matkulTemp);
+					Save::saveData(&recMatkul, MATKULPATH);
+					Save::saveData(&recDepartemen, DEPARTEMENPATH);
+					Save::saveData(&myData, DATAPATH);
+
+					cout << endl << "Matkul telah ditambahkan!" << endl;
+					cin.ignore();
+				}
+				break;
+			default:
+				break;
+			}
+		}
+		else
+		{
+			Matkul *matkul = matkuls.at(index);
+			Utils::clearScreen();
+			cout << ": Mata Kuliah Departemen " << departemen->getName() << endl << endl;
+			cout << "-----------------------------------------------" << endl;
+			cout << " " << index + 1 << "/" << matkuls.size() << "\t" << matkul->getName() << endl;
+			cout << "-----------------------------------------------" << endl;
+			cout << "Kode                : " << matkul->getKode() << endl;
+			cout << "SKS                 : " << matkul->getSKS() << endl;
+			cout << "-----------------------------------------------" << endl;
+			cout << endl;
+			cout << "Menu:" << endl;
+			cout << "  1. Tambah Mata Kuliah" << endl;
+			cout << "  2. Hapus Mata Kuliah ini" << endl;
+			if (index + 1 < int(matkuls.size()))
+				cout << "  >. Tampilkan Selanjutnya" << endl;
+			if (index > 0)
+				cout << "  <. Tampilkan Sebelumnya" << endl;
+			cout << "  0. Kembali" << endl;
+			cout << "-> Pilihan: ";
+			cin >> menu;
+			cin.ignore();
+
+			switch (menu)
+			{
+			case '0':
+				return;
+			case '1':
+				{
+					string matkulName, matkulKode;
+					int matkulSKS;
+					Utils::clearScreen();
+					cout << "Nama mata kuliah   : ";
+					getline(cin, matkulName);
+					cout << "Kode mata kuliah   : ";
+					getline(cin, matkulKode);
+					cout << "SKS mata kuliah    : ";
+					cin >> matkulSKS;
+					cin.ignore();
+
+					Matkul matkulTemp = Matkul(matkulName, matkulKode, matkulSKS, myData.lastMatkulIdAddOne(), departemen->getId());
+					departemen->addMatkul(matkulTemp.getId());
+					recMatkul.push_back(matkulTemp);
+					Save::saveData(&recMatkul, MATKULPATH);
+					Save::saveData(&recDepartemen, DEPARTEMENPATH);
+					Save::saveData(&myData, DATAPATH);
+
+					cout << endl << "Matkul telah ditambahkan!" << endl;
+					cin.ignore();
+				}
+				break;
+			case '2':
+				{
+					cout << "Anda yakin ingin menghapus " << matkul->getName() << "?" << endl;
+					cout << "-> [y/n]: ";
+					cin >> menu;
+					cin.ignore();
+					if (menu == 'y' || menu == 'Y')
+					{
+						recMatkul.erase(recMatkul.begin() + Matkul::getPositionById(&recMatkul, matkul->getId()));;
+						departemen->delMatkul(matkul->getId());
+						
+						Save::saveData(&recMatkul, MATKULPATH);
+						Save::saveData(&recDepartemen, DEPARTEMENPATH);
+
+						cout << endl << "Mata kuliah telah dihapus!" << endl;
+						cin.ignore();
+					}
+				}
+				break;
+			case '>':
+				if (index + 1 < int(matkuls.size())) index++;
+				break;
+			case '<':
+				if (index > 0) index--;
+				break;
+			default:
+				break;
+			}
+		}
+
+		matkuls = Matkul::getMatkulsByDeptId(&recMatkul, departemen->getId());
+		if ((unsigned int)index >= matkuls.size()) index = matkuls.size() - 1;
+	}
+}
 
 // ==================================================================
 
@@ -1127,7 +1302,7 @@ void addMahasiswa(string deptId)
 	int tempTahunMasuk = tahunMasuk % 100;
 	ss << tempTahunMasuk;
 	ss << 1;
-	sprintf(strTemp, "%03d", Departemen::getDepartemenById(&recDepartemen, departemenMhsId)->getAllMahasiswaId()->size() + 1);
+	sprintf(strTemp, "%03d", myData.mahasiswaIdCount(departemenMhsId));
 	ss << strTemp;
 	nrp = ss.str();
 	Mahasiswa newMahasiswa(myData.lastPersonIdAddOne(), name, dd, mm, yy, nrp, departemenMhsId, doswalId, tahunMasuk);
@@ -1196,7 +1371,7 @@ int main()
 		cout << "-> Username: ";
 		cin >> usernameInp;
 		cout << "-> Password: ";
-		cin >> passwordInp;
+		passwordInp = Utils::takePassword();
 		cin.ignore();
 		if (User *user = User::getUserByUname(&recUser, usernameInp))
 		{

@@ -14,6 +14,7 @@ using namespace std;
 Data::Data()
 {
     semester = 1;
+    masaFRS = Data::MasaFRS::Belum;
     this->lastAdminId = "a_-1";
     this->lastPersonId = "p_-1";
     this->lastDepartemenId = "d_-1";
@@ -31,6 +32,22 @@ Data::Data()
 // ======================== Public Function =========================
 int Data::getSemester(){ return this->semester; }
 
+Data::MasaFRS Data::getMasaFRS(){ return this->masaFRS; }
+
+string Data::getMasaFRSString()
+{ 
+    switch (masaFRS)
+    {
+    case Data::MasaFRS::Belum :
+        return "Belum Masa FRS";
+    case Data::MasaFRS::Isi :
+        return "Pengisian";
+    case Data::MasaFRS::Lewat :
+        return "Lewat Masa FRS";
+    }
+    return '\0';
+}
+
 string Data::getLastAdminId(){ return this->lastAdminId; }
 
 string Data::getLastPersonId(){ return this->lastPersonId; }
@@ -44,6 +61,8 @@ vector<tuple<string, int>> *Data::getDosenId(){ return &this->dosenId; }
 vector<tuple<string, int>> *Data::getMahasiswaId(){ return &this->mahasiswaId; }
 
 void Data::setSemester(int semester){ this->semester = semester; }
+
+void Data::setMasaFRS(Data::MasaFRS masa){ this->masaFRS = masa; }
 
 void Data::setLastAdminId(string last){ this->lastAdminId = last; }
 
