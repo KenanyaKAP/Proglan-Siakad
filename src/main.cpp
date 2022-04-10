@@ -58,6 +58,8 @@ void addMahasiswa(string deptId = "\0");
 void setNilaiMahasiswa(vector<Mahasiswa*> mahasiswas);
 void setNilaiFRS(Mahasiswa *mahasiswa);
 
+void insertData(string name, string kode, int sks, Departemen *departemen);
+
 // ==================================================================
 
 void adminPage(User *user)
@@ -1824,6 +1826,21 @@ void setNilaiFRS(Mahasiswa *mahasiswa)
 
 // ==================================================================
 
+void insertData(string matkulName, string matkulKode, int matkulSKS, Departemen *departemen)
+{
+
+	Matkul matkulTemp = Matkul(matkulName, matkulKode, matkulSKS, myData.lastMatkulIdAddOne(), departemen->getId());
+	departemen->addMatkul(matkulTemp.getId());
+	recMatkul.push_back(matkulTemp);
+	Save::saveData(&recMatkul, MATKULPATH);
+	Save::saveData(&recDepartemen, DEPARTEMENPATH);
+	Save::saveData(&myData, DATAPATH);
+
+	cout << endl << "Matkul telah ditambahkan!" << endl;
+}
+
+// ==================================================================
+
 int main()
 {
 	Save::loadData(myData, DATAPATH);
@@ -1842,6 +1859,12 @@ int main()
 		Save::saveData(&myData, DATAPATH);
 	}
 
+	&recDepartemen.at(23);
+	return 0;
+
+	insertData("Fisika Murni", "5001", 3, &recDepartemen.at(23));
+	
+
 	string usernameInp, passwordInp;
 	while (1)
 	{
@@ -1856,7 +1879,6 @@ int main()
 		cout << "Default" << endl;
 		cout << "Username: admin" << endl;
 		cout << "Password: Admin" << endl;
-		cout << endl;
 		cout << endl;
 		cout << "-> Username: ";
 		cin >> usernameInp;
