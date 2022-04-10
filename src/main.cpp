@@ -58,7 +58,7 @@ void addMahasiswa(string deptId = "\0");
 void setNilaiMahasiswa(vector<Mahasiswa*> mahasiswas);
 void setNilaiFRS(Mahasiswa *mahasiswa);
 
-void insertData(string name, string kode, int sks, Departemen *departemen);
+void insertData(string name, string departemenMhsId, string doswalId, int dd, int mm, int yy, int tahunMasuk);
 
 // ==================================================================
 
@@ -1826,17 +1826,52 @@ void setNilaiFRS(Mahasiswa *mahasiswa)
 
 // ==================================================================
 
-void insertData(string matkulName, string matkulKode, int matkulSKS, Departemen *departemen)
+void insertData(string name, string departemenMhsId, string doswalId, int dd, int mm, int yy, int tahunMasuk)
 {
-
-	Matkul matkulTemp = Matkul(matkulName, matkulKode, matkulSKS, myData.lastMatkulIdAddOne(), departemen->getId());
-	departemen->addMatkul(matkulTemp.getId());
-	recMatkul.push_back(matkulTemp);
-	Save::saveData(&recMatkul, MATKULPATH);
+	string nrp;
+	Utils::clearScreen();
+	
+	char strTemp[5];
+	stringstream ss;
+	ss << Departemen::getDepartemenById(&recDepartemen, departemenMhsId)->getKode();
+	int tempTahunMasuk = tahunMasuk % 100;
+	ss << tempTahunMasuk;
+	ss << 1;
+	sprintf(strTemp, "%03d", myData.mahasiswaIdCount(departemenMhsId));
+	ss << strTemp;
+	nrp = ss.str();
+	
+	FRS newFRS(myData.lastFRSIdAddOne());
+	
+	Mahasiswa newMahasiswa(myData.lastPersonIdAddOne(), name, dd, mm, yy, nrp, departemenMhsId, doswalId, newFRS.getId(), tahunMasuk);
+	recMahasiswa.push_back(newMahasiswa);
+	Departemen::getDepartemenById(&recDepartemen, departemenMhsId)->addMahasiswa(newMahasiswa.getId());
+	Dosen::getDosenById(&recDosen, doswalId)->addMahasiswaWaliId(newMahasiswa.getId());
+	
+	recFrs.push_back(newFRS);
+	Save::saveData(&recFrs, FRSPATH);
+	
+	Save::saveData(&recMahasiswa, MAHASISWAPATH);
 	Save::saveData(&recDepartemen, DEPARTEMENPATH);
+	Save::saveData(&recDosen, DOSENPATH);
 	Save::saveData(&myData, DATAPATH);
 
-	cout << endl << "Matkul telah ditambahkan!" << endl;
+	cout << endl << "Mahasiswa berhasil dibuat!" << endl; 
+
+	ss.str("");
+	sprintf(strTemp, "%02d", dd);
+	ss << strTemp;
+	sprintf(strTemp, "%02d", mm);
+	ss << strTemp;
+	sprintf(strTemp, "%04d", yy);
+	ss << strTemp;
+
+	recUser.push_back(User(newMahasiswa.getNRP(), ss.str(), User::Role::Mahasiswa, newMahasiswa.getId()));
+	Save::saveData(&recUser, USERPATH);
+
+	cout << endl << "User Dosen berhasil dibuat!" << endl;
+	cout << "Username: NPP" << endl;
+	cout << "Password: [ddmmyyyy] tanggal lahir" << endl;
 }
 
 // ==================================================================
@@ -1858,12 +1893,6 @@ int main()
 		Save::saveData(&recUser, USERPATH);
 		Save::saveData(&myData, DATAPATH);
 	}
-
-	&recDepartemen.at(23);
-	return 0;
-
-	insertData("Fisika Murni", "5001", 3, &recDepartemen.at(23));
-	
 
 	string usernameInp, passwordInp;
 	while (1)
