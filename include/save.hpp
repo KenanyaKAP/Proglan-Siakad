@@ -11,6 +11,7 @@ class Matkul;
 class Dosen;
 class Tendik;
 class Mahasiswa;
+class FRS;
 
 namespace Save
 {
@@ -34,6 +35,9 @@ namespace Save
     
     void saveData(std::vector<Mahasiswa> *data, const char *path);
     void loadData(std::vector<Mahasiswa> &out, const char *path);
+    
+    void saveData(std::vector<FRS> *data, const char *path);
+    void loadData(std::vector<FRS> &out, const char *path);
 };
 
 #endif

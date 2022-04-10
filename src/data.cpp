@@ -6,6 +6,7 @@
 #include "include/person.hpp"
 #include "include/departemen.hpp"
 #include "include/matkul.hpp"
+#include "include/frs.hpp"
 
 using namespace std;
 
@@ -13,12 +14,12 @@ using namespace std;
 // ========================== Constructor ===========================
 Data::Data()
 {
-    semester = 1;
     masaFRS = Data::MasaFRS::Belum;
     this->lastAdminId = "a_-1";
     this->lastPersonId = "p_-1";
     this->lastDepartemenId = "d_-1";
     this->lastMatkulId = "m_-1";
+    this->lastFRSId = "f_-1";
 }
 // ==================================================================
 
@@ -30,8 +31,6 @@ Data::Data()
 
 
 // ======================== Public Function =========================
-int Data::getSemester(){ return this->semester; }
-
 Data::MasaFRS Data::getMasaFRS(){ return this->masaFRS; }
 
 string Data::getMasaFRSString()
@@ -56,11 +55,11 @@ string Data::getLastDepartemenId(){ return this->lastDepartemenId; }
 
 string Data::getLastMatkulId(){ return this->lastMatkulId; }
 
+string Data::getLastFRSId(){ return this->lastFRSId; }
+
 vector<tuple<string, int>> *Data::getDosenId(){ return &this->dosenId; }
 
 vector<tuple<string, int>> *Data::getMahasiswaId(){ return &this->mahasiswaId; }
-
-void Data::setSemester(int semester){ this->semester = semester; }
 
 void Data::setMasaFRS(Data::MasaFRS masa){ this->masaFRS = masa; }
 
@@ -71,6 +70,8 @@ void Data::setLastPersonId(string last){ this->lastPersonId = last; }
 void Data::setLastDepartemenId(string last){ this->lastDepartemenId = last; }
 
 void Data::setLastMatkulId(string last){ this->lastMatkulId = last; }
+
+void Data::setLastFRSId(string last){ this->lastFRSId = last; }
 
 void Data::setDosenId(vector<tuple<string, int>> *data){ this->dosenId = *data; }
 
@@ -98,6 +99,12 @@ string Data::lastMatkulIdAddOne()
 {
     this->lastMatkulId = Matkul::matkulIdAddOne(this->lastMatkulId);
     return this->lastMatkulId;
+}
+
+string Data::lastFRSIdAddOne()
+{
+    this->lastFRSId = FRS::frsIdAddOne(this->lastFRSId);
+    return this->lastFRSId;
 }
 
 int Data::dosenIdCount(string tahun)

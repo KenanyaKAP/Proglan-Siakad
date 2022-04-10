@@ -14,6 +14,7 @@
 #include "include/dosen.hpp"
 #include "include/tendik.hpp"
 #include "include/mahasiswa.hpp"
+#include "include/frs.hpp"
 
 using namespace std;
 
@@ -24,12 +25,12 @@ void Save::saveData(Data *data, const char *path)
     file.open(path, ios::trunc | ios::out | ios::in);
     if (!file.is_open()){ cout << "Error while opening " << path << "!" << endl; exit(1); }
 
-    file << Utils::encrypt(to_string(data->getSemester())) << '\0';
     file << Utils::encrypt(to_string(data->getMasaFRS())) << '\0';
     file << Utils::encrypt(data->getLastAdminId()) << '\0';
     file << Utils::encrypt(data->getLastPersonId()) << '\0';
     file << Utils::encrypt(data->getLastDepartemenId()) << '\0';
     file << Utils::encrypt(data->getLastMatkulId()) << '\0';
+    file << Utils::encrypt(data->getLastFRSId()) << '\0';
     file << Utils::encrypt(to_string(data->getDosenId()->size())) << '\0';
     for (tuple<string, int> &dosen : *data->getDosenId())
     {
@@ -64,12 +65,13 @@ void Save::loadData(Data &out, const char *path)
         while (getline(ssData, temp, '\0'))
             dataString.push_back(temp);
         
-        out.setSemester(stoi(dataString[0]));
-        out.setMasaFRS((Data::MasaFRS)stoi(dataString[1]));
-        out.setLastAdminId(dataString[2]);
-        out.setLastPersonId(dataString[3]);
-        out.setLastDepartemenId(dataString[4]);
-        out.setLastMatkulId(dataString[5]);
+        // out.setSemester(stoi(dataString[0]));
+        out.setMasaFRS((Data::MasaFRS)stoi(dataString[0]));
+        out.setLastAdminId(dataString[1]);
+        out.setLastPersonId(dataString[2]);
+        out.setLastDepartemenId(dataString[3]);
+        out.setLastMatkulId(dataString[4]);
+        out.setLastFRSId(dataString[5]);
 
         int v1 = 6;
         int v2 = 7 + stoi(dataString[v1]) * 2;
@@ -313,7 +315,7 @@ void Save::loadData(vector<Dosen> &out, const char *path)
 
 
 
-// ==========================    TENDIK    ==========================
+// ==========================    Tendik    ==========================
 void Save::saveData(vector<Tendik> *data, const char *path)
 {
     fstream file;
@@ -379,14 +381,13 @@ void Save::saveData(vector<Mahasiswa> *data, const char *path)
         file << Utils::encrypt(mahasiswa.getNRP()) << '\0';
         file << Utils::encrypt(mahasiswa.getDepartemenId()) << '\0';
         file << Utils::encrypt(mahasiswa.getDoswalId()) << '\0';
+        file << Utils::encrypt(mahasiswa.getFRSId()) << '\0';
         file << Utils::encrypt(to_string(mahasiswa.getTahunMasuk())) << '\0';
         file << Utils::encrypt(to_string(mahasiswa.getSemester())) << '\0';
         file << Utils::encrypt(to_string(mahasiswa.getSKSLulus())) << '\0';
-        file << Utils::encrypt(to_string(mahasiswa.getIPK())) << '\0';
-        file << Utils::encrypt(to_string(mahasiswa.getAllIPS()->size())) << '\0';
-        for (float &ips : *mahasiswa.getAllIPS())
+        for (unsigned int i = 0; i < 14; i++)
         {
-            file << Utils::encrypt(to_string(ips)) << '\0';
+            file << Utils::encrypt(to_string(mahasiswa.getAllIPS()->at(i))) << '\0';
         }
         file << endl;
     }
@@ -413,13 +414,76 @@ void Save::loadData(vector<Mahasiswa> &out, const char *path)
         while (getline(ssData, temp, '\0'))
             dataString.push_back(temp);
         
-        Mahasiswa mahasiswa(dataString[0], dataString[1], stoi(dataString[2]), stoi(dataString[3]), stoi(dataString[4]), dataString[5], dataString[6], dataString[7], stoi(dataString[8]));
-        mahasiswa.setSemester(stoi(dataString[9]));
-        mahasiswa.setSKSLulus(stoi(dataString[10]));
-        for (int i = 12; i < stoi(dataString[11]) + 12; i++)
+        Mahasiswa mahasiswa(dataString[0], dataString[1], stoi(dataString[2]), stoi(dataString[3]), stoi(dataString[4]), dataString[5], dataString[6], dataString[7], dataString[8], stoi(dataString[9]));
+        
+        mahasiswa.setSemester(stoi(dataString[10]));
+        mahasiswa.setSKSLulus(stoi(dataString[11]));
+        for (int i = 12; i < 26; i++)
+        {
             mahasiswa.setIPS(i - 11, stof(dataString[i]));
+        }
 
         out.push_back(mahasiswa);
+    }
+}
+// ==================================================================
+
+
+
+// ============================    FRS    ===========================
+void Save::saveData(vector<FRS> *data, const char *path)
+{
+    fstream file;
+    file.open(path, ios::trunc | ios::out | ios::in);
+    if (!file.is_open()){ cout << "Error while opening " << path << "!" << endl; exit(1); }
+
+    for (FRS &frs : *data)
+    {
+        file << Utils::encrypt(frs.getId()) << '\0';
+        file << Utils::encrypt(to_string(frs.getStatus())) << '\0';
+        file << Utils::encrypt(to_string(frs.getAllMatkulId()->size())) << '\0';
+        for (unsigned int i = 0; i < frs.getAllMatkulId()->size(); i++)
+        {
+            file << Utils::encrypt(frs.getAllMatkulId()->at(i)) << '\0';
+            file << Utils::encrypt(to_string(frs.getAllMatkulSKS()->at(i))) << '\0';
+            file << Utils::encrypt(to_string(frs.getAllNilaiMatkul()->at(i))) << '\0';
+        }
+        file << endl;
+    }
+}
+
+void Save::loadData(vector<FRS> &out, const char *path)
+{
+    fstream file;
+    file.open(path, ios::in);
+    if (!file.is_open())
+    {
+        file.close();
+        file.open(path, ios::trunc | ios::out | ios::in);
+    }
+    if (!file.is_open()){ cout << "Error while opening " << path << "!" << endl; exit(1); }
+
+    string data;
+    while (getline(file, data))
+    {
+        string temp;
+        stringstream ssData(Utils::decrypt(data));
+        
+        vector<string> dataString;
+        while (getline(ssData, temp, '\0'))
+            dataString.push_back(temp);
+        
+        FRS frs(dataString[0]);
+        frs.setStatus((FRS::Status)stoi(dataString[1]));
+        
+        int v1 = 2;
+
+        for (int i = v1 + 1; i < v1 + 1 + stoi(dataString[v1]) * 3; i += 3)
+        {
+            frs.addMatkul(dataString[i], stoi(dataString[i+1]), stof(dataString[i+2]));
+        }
+        
+        out.push_back(frs);
     }
 }
 // ==================================================================

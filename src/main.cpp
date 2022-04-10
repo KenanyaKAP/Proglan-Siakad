@@ -14,6 +14,7 @@
 #include "include/dosen.hpp"
 #include "include/tendik.hpp"
 #include "include/mahasiswa.hpp"
+#include "include/frs.hpp"
 
 #define DATAPATH "data/data.bin"
 #define USERPATH "data/user.bin"
@@ -22,6 +23,7 @@
 #define DOSENPATH "data/dosen.bin"
 #define TENDIKPATH "data/tendik.bin"
 #define MAHASISWAPATH "data/mahasiswa.bin"
+#define FRSPATH "data/frs.bin"
 
 using namespace std;
 
@@ -32,23 +34,29 @@ vector<Matkul> recMatkul;
 vector<Dosen> recDosen;
 vector<Tendik> recTendik;
 vector<Mahasiswa> recMahasiswa;
+vector<FRS> recFrs;
 
 // ==================================================================
 
 void adminPage(User *user);
 void adminMenuPage();
 void dosenPage(Dosen *dosen);
-void showMatkulPage(Departemen *departemen);
+void mahasiswaPage(Mahasiswa *mahasiswa);
+
 void showUserPage();
 void showDepartemenPage();
-
+void showMatkulPage(Departemen *departemen);
 void showDosenPage(string deptId = "\0");
 void showTendikPage();
 void showMahasiswaPage(string deptId = "\0");
+void showFRSPage(Mahasiswa *mahasiswa);
 
 void addDosen(string deptId = "\0");
 void addTendik();
 void addMahasiswa(string deptId = "\0");
+
+void setNilaiMahasiswa(vector<Mahasiswa*> mahasiswas);
+void setNilaiFRS(Mahasiswa *mahasiswa);
 
 // ==================================================================
 
@@ -73,7 +81,7 @@ void adminPage(User *user)
 		cout << "  3. Tampilkan Dosen" << endl;
 		cout << "  4. Tampilkan Tenaga Kependidikan" << endl;
 		cout << "  5. Tampilkan Mahasiswa" << endl;
-		cout << "  8. |Menu Admin|" << endl;
+		cout << "  8. MENU ADMIN" << endl;
 		cout << "  9. Ganti password" << endl;
 		cout << "  0. Log out" << endl;
 		cout << "-> Pilihan: ";
@@ -143,8 +151,11 @@ void adminMenuPage()
 	{
 		Utils::clearScreen();
 		cout << ": Halaman Menu Admin" << endl << endl;
+		cout << "Masa FRS : " << myData.getMasaFRSString() << endl << endl;
 		cout << "Menu: " << endl;
 		cout << "  1. Ubah Masa Pendidikan" << endl;
+		cout << "  2. Setujui Semua FRS Mahasiswa" << endl;
+		cout << "  3. Isi Nilai Mahasiswa" << endl;
 		cout << "  0. Kembali" << endl;
 		cout << "-> Pilihan: ";
 		cin >> menu;
@@ -159,34 +170,139 @@ void adminMenuPage()
 					Utils::clearScreen();
 					cout << "Awal >> Pengisian FRS >> Pelaksanaan Semester >> Ganti Semester" << endl << endl;
 					cout << "Masa FRS : " << myData.getMasaFRSString() << endl;
-					cout << "Semester : " << myData.getSemester() << endl;
-					if (myData.getMasaFRS() == 0)
-						cout << "Ubah masa FRS ke Pengisian ?" << endl;
-					else if (myData.getMasaFRS() == 1)
+					if (myData.getMasaFRS() == Data::MasaFRS::Belum)
+						cout << "Ubah masa ke Pengisian FRS ?" << endl;
+					else if (myData.getMasaFRS() == Data::MasaFRS::Isi)
 						cout << "Akhiri masa Pengisian FRS ?" << endl;
-					else if (myData.getMasaFRS() == 2)
-						cout << "Ubah menjadi semester " << myData.getSemester() + 1 << " ?" << endl;
+					else if (myData.getMasaFRS() == Data::MasaFRS::Lewat)
+						cout << "Ubah semester ?" << endl;
 					cout << "-> [y/n]: ";
 					cin >> menu;
 					cin.ignore();
 
 					if (menu == 'Y' || menu == 'y')
 					{
-						if (myData.getMasaFRS() == 0)
+						if (myData.getMasaFRS() == Data::MasaFRS::Belum)
 						{
 							myData.setMasaFRS(Data::MasaFRS::Isi);
 							Save::saveData(&myData, DATAPATH);
-						}
-						else if (myData.getMasaFRS() == 1)
-						{
-							
-						}
-						else if (myData.getMasaFRS() == 2)
-						{
 
+							cout << endl << "Masa FRS berhasil diubah ke Pengisian!" << endl;
+							cin.ignore();
+						}
+						else if (myData.getMasaFRS() == Data::MasaFRS::Isi)
+						{
+							int notProved = 0;
+							for (Mahasiswa &mahasiswa : recMahasiswa)
+							{
+								if (FRS::getFRSById(&recFrs, mahasiswa.getFRSId())->getStatus() == FRS::Status::Unproved)
+									notProved++;
+							}
+							if (notProved != 0)
+							{
+								cout << endl << "Masih terdapat " << notProved << " FRS Mahasiswa belum disetujui!" << endl;
+								cin.ignore();
+							}
+							else
+							{
+								myData.setMasaFRS(Data::MasaFRS::Lewat);
+								Save::saveData(&myData, DATAPATH);
+
+								cout << endl << "Masa FRS berhasil diubah!" << endl;
+								cin.ignore();
+							}
+						}
+						else if (myData.getMasaFRS() == Data::MasaFRS::Lewat)
+						{
+							bool cancel = false;
+							for (Mahasiswa &mahasiswa : recMahasiswa)
+							{
+								if (!mahasiswa.getIPS(mahasiswa.getSemester()))
+								{
+									cancel = true;
+									break;
+								}
+							}
+
+							if (cancel)
+							{
+								cout << endl << "Masih terdapat Mahasiswa dengan IPS 0!" << endl;
+								cin.ignore();
+								break;
+							}
+
+							for (Mahasiswa &mahasiswa : recMahasiswa)
+							{
+								mahasiswa.setIPS(mahasiswa.getSemester(), FRS::getFRSById(&recFrs, mahasiswa.getFRSId())->getIPS());
+								mahasiswa.setSKSLulus(mahasiswa.getSKSLulus() + FRS::getFRSById(&recFrs, mahasiswa.getFRSId())->getTotalSKS());
+								mahasiswa.setSemester(mahasiswa.getSemester() + 1);
+								FRS::getFRSById(&recFrs, mahasiswa.getFRSId())->resetFRS();
+							}
+
+							myData.setMasaFRS(Data::MasaFRS::Belum);
+
+							Save::saveData(&recMahasiswa, MAHASISWAPATH);
+							Save::saveData(&recFrs, FRSPATH);
+							Save::saveData(&myData, DATAPATH);
+
+							cout << endl << "Semester Telah diganti!" << endl;
+							cin.ignore();
 						}
 					}
 				}
+				break;
+			case '2':
+				{
+					if (myData.getMasaFRS() != Data::MasaFRS::Isi)
+					{
+						cout << endl << myData.getMasaFRSString() << "!" << endl;
+						cin.ignore();
+						break;
+					}
+
+					char menu;
+					Utils::clearScreen();
+					cout << "FRS Mahasiswa: " << recMahasiswa.size() << endl << endl;
+					cout << "Setujui Semua FRS ?" << endl;
+					cout << "-> [y/n]: ";
+					cin >> menu;
+					cin.ignore();
+
+					if (menu == 'Y' || menu == 'y')
+					{
+						int sksZero = 0;
+						for (Mahasiswa &mahasiswa : recMahasiswa)
+						{
+							if (FRS::getFRSById(&recFrs, mahasiswa.getFRSId())->getTotalSKS() == 0)
+							{
+								cout << endl << "FRS " << mahasiswa.getName() << " masih kosong!" << endl;
+								cin.ignore();
+								sksZero = 1;
+								break;
+							}
+						}
+
+						if (sksZero == 1) break;
+
+						for (Mahasiswa &mahasiswa : recMahasiswa)
+						{
+							FRS::getFRSById(&recFrs, mahasiswa.getFRSId())->setStatus(FRS::Status::Approved);
+						}
+						Save::saveData(&recFrs, FRSPATH);
+
+						cout << endl << "Semua FRS telah disetujui!" << endl;
+						cin.ignore();
+					}
+				}
+				break;
+			case '3':
+				if (myData.getMasaFRS() != Data::MasaFRS::Lewat)
+				{
+					cout << endl << "Belum masa mengisi Nilai Mahasiswa!" << endl;
+					cin.ignore();
+					break;
+				}
+				setNilaiMahasiswa(Mahasiswa::makeVectorPointer(&recMahasiswa));
 				break;
 			default:
 				break;
@@ -206,7 +322,7 @@ void dosenPage(Dosen *dosen)
 		cout << "Selamat datang " << dosen->getName() << "!" << endl << endl;
 		cout << "Menu: " << endl;
 		cout << "  1. Setujui FRS" << endl;
-		cout << "  2. Setujui FRS" << endl;
+		cout << "  2. Isi Nilai Mahasiswa" << endl;
 		cout << "  9. Ubah password" << endl;
 		cout << "  0. Log out" << endl;
 		cout << "-> Pilihan: ";
@@ -219,19 +335,42 @@ void dosenPage(Dosen *dosen)
 			return;
 		case '1':
 			{
-				if (myData.getMasaFRS() == 0)
+				if (myData.getMasaFRS() != Data::MasaFRS::Isi)
 				{
-					cout << myData.getMasaFRSString() << "!" << endl;
+					cout << endl << myData.getMasaFRSString() << "!" << endl;
 					cin.ignore();
 					break;
+				}
+				
+				char menu;
+				Utils::clearScreen();
+				cout << "FRS Mahasiswa: " << dosen->getAllMahasiswaWaliId()->size() << endl << endl;
+				cout << "Setujui Semua FRS ?" << endl;
+				cout << "-> [y/n]: ";
+				cin >> menu;
+
+				if (menu == 'Y' || menu == 'y')
+				{
+					for (string &mhsId : *dosen->getAllMahasiswaWaliId())
+					{
+						FRS::getFRSById(&recFrs, Mahasiswa::getMahasiswaById(&recMahasiswa, mhsId)->getFRSId())->setStatus(FRS::Status::Approved);
+					}
+					Save::saveData(&recFrs, FRSPATH);
+
+					cout << "Semua FRS telah disetujui!" << endl;
+					cin.ignore();
 				}
 
 			}
 			break;
 		case '2':
+			if (myData.getMasaFRS() != Data::MasaFRS::Lewat)
 			{
-				
+				cout << endl << "Belum masa mengisi Nilai Mahasiswa!" << endl;
+				cin.ignore();
+				break;
 			}
+			setNilaiMahasiswa(Mahasiswa::getMahasiswasById(&recMahasiswa, dosen->getAllMahasiswaWaliId()));
 			break;
 		case '9':
 			{
@@ -245,6 +384,65 @@ void dosenPage(Dosen *dosen)
 				reNewPass = Utils::takePassword();
 
 				User *user = User::getUserByUname(&recUser, dosen->getNPP());
+
+				if (user->getPassword() == oldPass)
+				{
+					if (newPass == reNewPass)
+					{
+						user->changePassword(newPass);
+						Save::saveData(&recUser, USERPATH);
+						cout << endl << "Password berhasil diubah!" << endl;
+						cin.ignore();
+						return;
+					}
+				}
+				cout << endl << "Password tidak sama!" << endl;
+				cin.ignore();
+			}
+			break;
+		default:
+			break;
+		}
+	}
+}
+
+// ==================================================================
+
+void mahasiswaPage(Mahasiswa *mahasiswa)
+{
+	char menu;
+	
+	while (1)
+	{
+		Utils::clearScreen();
+		cout << "Selamat datang " << mahasiswa->getName() << "!" << endl << endl;
+		cout << "Menu: " << endl;
+		cout << "  1. Lihat FRS" << endl;
+		cout << "  9. Ubah password" << endl;
+		cout << "  0. Log out" << endl;
+		cout << "-> Pilihan: ";
+		cin >> menu;
+		cin.ignore();
+
+		switch (menu)
+		{
+		case '0':
+			return;
+		case '1':
+			showFRSPage(mahasiswa);
+			break;
+		case '9':
+			{
+				Utils::clearScreen();
+				string oldPass, newPass, reNewPass;
+				cout << "Password lama:\n-> ";
+				oldPass = Utils::takePassword();
+				cout << "Password baru:\n-> ";
+				newPass = Utils::takePassword();
+				cout << "Ketik ulang password baru:\n-> ";
+				reNewPass = Utils::takePassword();
+
+				User *user = User::getUserByUname(&recUser, mahasiswa->getNRP());
 
 				if (user->getPassword() == oldPass)
 				{
@@ -908,6 +1106,7 @@ void showMahasiswaPage(string deptId)
 			cout << "Tahun Masuk         : " << mahasiswa.getTahunMasuk() << endl;
 			cout << "Semester            : " << mahasiswa.getSemester() << endl;
 			cout << "SKS Lulus           : " << mahasiswa.getSKSLulus() << endl;
+			cout << "IPS                 : " << FRS::getFRSById(&recFrs, mahasiswa.getFRSId())->getIPS() << endl;
 			cout << "IPK                 : " << mahasiswa.getIPK() << endl;
 			cout << "-----------------------------------------------" << endl;
 			cout << endl;
@@ -918,6 +1117,8 @@ void showMahasiswaPage(string deptId)
 			cout << endl;
 			cout << "  2. Hapus Mahasiswa ini" << endl;
 			cout << "  3. Ubah Dosen Wali" << endl;
+			cout << "  4. Tampilkan FRS" << endl;
+			cout << "  5. Tampilkan Semua IPS" << endl;
 			if (index + 1 < int(mahasiswas.size()))
 				cout << "  >. Tampilkan Selanjutnya" << endl;
 			if (index > 0)
@@ -944,10 +1145,12 @@ void showMahasiswaPage(string deptId)
 					{
 						recUser.erase(recUser.begin() + User::getPositionById(&recUser, mahasiswa.getUser(&recUser)->getPersonId()));
 						Departemen::getDepartemenById(&recDepartemen, mahasiswa.getDepartemenId())->delMahasiswa(mahasiswa.getId());
+						Dosen::getDosenById(&recDosen, mahasiswa.getDoswalId())->delMahasiswaWaliId(mahasiswa.getId());
 						recMahasiswa.erase(recMahasiswa.begin() + Mahasiswa::getPositionById(&recMahasiswa, mahasiswa.getId()));
 
 						Save::saveData(&recUser, USERPATH);
 						Save::saveData(&recDepartemen, DEPARTEMENPATH);
+						Save::saveData(&recDosen, DOSENPATH);
 						Save::saveData(&recMahasiswa, MAHASISWAPATH);
 
 						cout << endl << "Dosen telah dihapus!" << endl;
@@ -963,7 +1166,8 @@ void showMahasiswaPage(string deptId)
 					while (1)
 					{
 						Utils::clearScreen();
-						Utils::printTable<string, string>(Dosen::makeTuples(&dosenDepartemen), Dosen::tuplesHeader(), page);
+						Utils::printTable(Dosen::makeTuples(&dosenDepartemen), Dosen::tuplesHeader(), page);
+
 						cout << endl;
 						cout << "Menu: " << endl;
 						cout << " 1~10. Pilih dosen wali" << endl;
@@ -1007,6 +1211,35 @@ void showMahasiswaPage(string deptId)
 					}
 				}
 				break;
+			case '4':
+				showFRSPage(&mahasiswa);
+				break;
+			case '5':
+				{
+					int page = 1;
+					string menu;
+					while (1)
+					{
+						Utils::clearScreen();
+						Utils::printTable(mahasiswa.makeTuplesIPS(), Mahasiswa::tuplesIPSHeader(), page);
+
+						cout << endl;
+						cout << "Menu: " << endl;
+						cout << "  0. Kembali" << endl;
+						if (page <= int((mahasiswa.makeTuplesIPS().size() - 1) / 10) && mahasiswa.makeTuplesIPS().size() > 0)
+							cout << "  >. Tampilkan Selanjutnya" << endl;
+						if (page > 1)
+							cout << "  <. Tampilkan Sebelumnya" << endl;
+						cout << "-> Pilihan: ";
+						cin >> menu;
+						cin.ignore();
+
+						if (menu == ">" && page <= int((mahasiswa.makeTuplesIPS().size() - 1) / 10) && mahasiswa.makeTuplesIPS().size() > 0) page++;
+						else if (menu == "<" && page > 1) page--;
+						else if (menu == "0") break;
+					}
+				}
+				break;
 			case '>':
 				if (index + 1 < int(mahasiswas.size())) index++;
 				break;
@@ -1022,6 +1255,148 @@ void showMahasiswaPage(string deptId)
 		if (deptId != "\0")
 			mahasiswas = Mahasiswa::getMahasiswasByDeptId(&recMahasiswa, deptId);
 		if ((unsigned int)index >= mahasiswas.size()) index = mahasiswas.size() - 1;
+	}
+}
+
+// ==================================================================
+
+void showFRSPage(Mahasiswa *mahasiswa)
+{
+	char menu;
+	while (1)
+	{
+		FRS *frs = FRS::getFRSById(&recFrs, mahasiswa->getFRSId());
+		Utils::clearScreen();
+		cout << ": " << myData.getMasaFRSString() << endl << endl;
+		cout << "Nama        : " << mahasiswa->getName() << endl;
+		cout << "NRP         : " << mahasiswa->getNRP() << endl;
+		cout << "Semester    : " << mahasiswa->getSemester() << endl;
+		cout << "Dosen Wali  : " << Dosen::getDosenById(&recDosen, mahasiswa->getDoswalId())->getName() << endl;
+		cout << "Status      : " << frs->getStatusString() << endl;
+		cout << "Sisa SKS    : " << frs->getMaxSKS() - frs->getTotalSKS() << "/" << frs->getMaxSKS() << endl << endl;
+		
+		if (frs->getAllMatkulId()->size() != 0)
+		{
+			vector<Matkul*> allMatkul = Matkul::getMatkulsById(&recMatkul, frs->getAllMatkulId());
+			Utils::printTable(FRS::makeTuples(&allMatkul, frs->getAllNilaiMatkul()), FRS::tuplesHeader(), 1);
+			cout << "Total S*N : " << frs->getTotalNilai() << endl;
+			cout << "IPS       : " << frs->getIPS() << endl;
+			cout << endl;
+		}
+		
+		cout << "Menu: " << endl;
+		if (myData.getMasaFRS() == Data::MasaFRS::Isi && frs->getStatus() == FRS::Status::Unproved)
+		{
+			cout << "  1. Tambah Kelas" << endl;
+			if (frs->getAllMatkulId()->size() != 0)
+				cout << "  2. Hapus Kelas" << endl;
+		}
+		cout << "  0. Kembali" << endl;
+		cout << "-> Pilihan: ";
+		cin >> menu;
+		cin.ignore();
+
+		switch (menu)
+		{
+		case '0':
+			return;
+		case '1':
+			if (myData.getMasaFRS() == Data::MasaFRS::Isi && frs->getStatus() == FRS::Status::Unproved)
+			{
+				int page = 1;
+				string menu;
+				vector<Matkul*> matkulExclude = Matkul::getMatkulExcludeById(&recMatkul, frs->getAllMatkulId());
+
+				while (1)
+				{
+					Utils::clearScreen();
+					Utils::printTable(Matkul::makeTuples(&matkulExclude, &recDepartemen), Matkul::tuplesHeader(), page);
+
+					cout << endl;
+					cout << "Menu: " << endl;
+					cout << " 1~10. Pilih mata kuliah" << endl;
+					if (page <= int((matkulExclude.size() - 1) / 10) && matkulExclude.size() > 0)
+						cout << "    >. Tampilkan Selanjutnya" << endl;
+					if (page > 1)
+						cout << "    <. Tampilkan Sebelumnya" << endl;
+					cout << "  0. Kembali" << endl;
+					cout << "-> Pilihan: ";
+					cin >> menu;
+					cin.ignore();
+
+					if (menu == ">" && page <= int((matkulExclude.size() - 1) / 10) && matkulExclude.size() > 0) page++;
+					else if (menu == "<" && page > 1) page--;
+					else if (menu == "0") break;
+					else {
+						int select;
+						stringstream temp(menu);
+						temp >> select;
+						if (select > 10 * (page - 1) && select <= 10 * page && select <= (int)matkulExclude.size())
+						{
+							if (frs->getTotalSKS() + matkulExclude.at(select - 1)->getSKS() <= frs->getMaxSKS())
+							{
+								frs->addMatkul(matkulExclude.at(select - 1)->getId(), matkulExclude.at(select - 1)->getSKS(), 0.0f);
+								Save::saveData(&recFrs, FRSPATH);
+								cout << endl << "Kelas berhasil ditambahkan!" << endl;
+								cin.ignore();
+								break;
+							}
+							else
+							{
+								cout << endl << "Jumlah SKS melampaui maksimal!" << endl;
+								cin.ignore();
+							}
+						}
+					}
+				}
+			}
+			break;
+		case '2':
+			if (myData.getMasaFRS() == Data::MasaFRS::Isi && frs->getStatus() == FRS::Status::Unproved && frs->getAllMatkulId()->size() != 0)
+			{
+				int page = 1;
+				string menu;
+				vector<Matkul*> mhsMatkul = Matkul::getMatkulsById(&recMatkul, frs->getAllMatkulId());
+
+				while (1)
+				{
+					Utils::clearScreen();
+					Utils::printTable(Matkul::makeTuples(&mhsMatkul, &recDepartemen), Matkul::tuplesHeader(), page);
+
+					cout << endl;
+					cout << "Menu: " << endl;
+					cout << " 1~10. Pilih mata kuliah" << endl;
+					if (page <= int((mhsMatkul.size() - 1) / 10) && mhsMatkul.size() > 0)
+						cout << "    >. Tampilkan Selanjutnya" << endl;
+					if (page > 1)
+						cout << "    <. Tampilkan Sebelumnya" << endl;
+					cout << "  0. Kembali" << endl;
+					cout << "-> Pilihan: ";
+					cin >> menu;
+					cin.ignore();
+
+					if (menu == ">" && page <= int((mhsMatkul.size() - 1) / 10) && mhsMatkul.size() > 0) page++;
+					else if (menu == "<" && page > 1) page--;
+					else if (menu == "0") break;
+					else {
+						int select;
+						stringstream temp(menu);
+						temp >> select;
+						if (select > 10 * (page - 1) && select <= 10 * page && select <= (int)mhsMatkul.size())
+						{
+							frs->delMatkul(mhsMatkul.at(select - 1)->getId());
+							Save::saveData(&recFrs, FRSPATH);
+							cout << endl << "Kelas berhasil dihapus!" << endl;
+							cin.ignore();
+							break;
+						}
+					}
+				}
+			}
+			break;
+		default:
+			break;
+		}
 	}
 }
 
@@ -1047,7 +1422,7 @@ void addDosen(string deptId)
 		while (1)
 		{
 			Utils::clearScreen();
-			Utils::printTable<string, string>(Departemen::makeTuples(&recDepartemen), Departemen::tuplesHeader(), page);
+			Utils::printTable(Departemen::makeTuples(&recDepartemen), Departemen::tuplesHeader(), page);
 			cout << endl;
 			cout << "Menu: " << endl;
 			cout << " 1~10. Pilih departemen dosen" << endl;
@@ -1212,7 +1587,7 @@ void addMahasiswa(string deptId)
 		while (1)
 		{
 			Utils::clearScreen();
-			Utils::printTable<string, string>(Departemen::makeTuples(&recDepartemen), Departemen::tuplesHeader(), page);
+			Utils::printTable(Departemen::makeTuples(&recDepartemen), Departemen::tuplesHeader(), page);
 			cout << endl;
 			cout << "Menu: " << endl;
 			cout << " 1~10. Pilih departemen mahasiswa" << endl;
@@ -1258,7 +1633,7 @@ void addMahasiswa(string deptId)
 	while (1)
 	{
 		Utils::clearScreen();
-		Utils::printTable<string, string>(Dosen::makeTuples(&dosenDepartemen), Dosen::tuplesHeader(), page);
+		Utils::printTable(Dosen::makeTuples(&dosenDepartemen), Dosen::tuplesHeader(), page);
 		cout << endl;
 		cout << "Menu: " << endl;
 		cout << " 1~10. Pilih dosen wali" << endl;
@@ -1305,10 +1680,17 @@ void addMahasiswa(string deptId)
 	sprintf(strTemp, "%03d", myData.mahasiswaIdCount(departemenMhsId));
 	ss << strTemp;
 	nrp = ss.str();
-	Mahasiswa newMahasiswa(myData.lastPersonIdAddOne(), name, dd, mm, yy, nrp, departemenMhsId, doswalId, tahunMasuk);
+	
+	FRS newFRS(myData.lastFRSIdAddOne());
+	
+	Mahasiswa newMahasiswa(myData.lastPersonIdAddOne(), name, dd, mm, yy, nrp, departemenMhsId, doswalId, newFRS.getId(), tahunMasuk);
 	recMahasiswa.push_back(newMahasiswa);
 	Departemen::getDepartemenById(&recDepartemen, departemenMhsId)->addMahasiswa(newMahasiswa.getId());
 	Dosen::getDosenById(&recDosen, doswalId)->addMahasiswaWaliId(newMahasiswa.getId());
+	
+	recFrs.push_back(newFRS);
+	Save::saveData(&recFrs, FRSPATH);
+	
 	Save::saveData(&recMahasiswa, MAHASISWAPATH);
 	Save::saveData(&recDepartemen, DEPARTEMENPATH);
 	Save::saveData(&recDosen, DOSENPATH);
@@ -1335,6 +1717,113 @@ void addMahasiswa(string deptId)
 
 // ==================================================================
 
+void setNilaiMahasiswa(vector<Mahasiswa*> mahasiswas)
+{
+	int page = 1;
+	string menu;
+	while (1)
+	{
+		Utils::clearScreen();
+		Utils::printTable(Mahasiswa::makeTuples(&mahasiswas), Mahasiswa::tuplesHeader(), page);
+		cout << endl;
+		cout << "Menu: " << endl;
+		cout << " 1~10. Pilih mahasiswa" << endl;
+		if (page <= int((mahasiswas.size() - 1) / 10) && mahasiswas.size() > 0)
+			cout << "    >. Tampilkan Selanjutnya" << endl;
+		if (page > 1)
+			cout << "    <. Tampilkan Sebelumnya" << endl;
+		cout << "  0. Kembali" << endl;
+		cout << "-> Pilihan: ";
+		cin >> menu;
+		cin.ignore();
+
+		if (menu == ">" && page <= int((mahasiswas.size() - 1) / 10) && mahasiswas.size() > 0) page++;
+		else if (menu == "<" && page > 1) page--;
+		else if (menu == "0") return;
+		else {
+			int select;
+			stringstream temp(menu);
+			temp >> select;
+			if (select > 10 * (page - 1) && select <= 10 * page && select <= (int)mahasiswas.size())
+			{
+				setNilaiFRS(mahasiswas.at(select - 1));
+			}
+		}
+	}
+}
+
+// ==================================================================
+
+void setNilaiFRS(Mahasiswa *mahasiswa)
+{
+	FRS *frs = FRS::getFRSById(&recFrs, mahasiswa->getFRSId());
+	if (frs->getAllMatkulId()->size() == 0)
+	{
+		cout << endl << "FRS Kosong!" << endl;
+		cin.ignore();
+		return;
+	}
+
+	int page = 1;
+	string menu;
+	vector<Matkul*> allMatkul = Matkul::getMatkulsById(&recMatkul, frs->getAllMatkulId());
+	while (1)
+	{
+		Utils::clearScreen();
+		Utils::printTable(FRS::makeTuples(&allMatkul, frs->getAllNilaiMatkul()), FRS::tuplesHeader(), page);
+		cout << endl;
+		cout << "Menu: " << endl;
+		cout << " 1~10. Pilih matkul" << endl;
+		if (page <= int((allMatkul.size() - 1) / 10) && allMatkul.size() > 0)
+			cout << "    >. Tampilkan Selanjutnya" << endl;
+		if (page > 1)
+			cout << "    <. Tampilkan Sebelumnya" << endl;
+		cout << "  0. Kembali" << endl;
+		cout << "-> Pilihan: ";
+		cin >> menu;
+		cin.ignore();
+
+		if (menu == ">" && page <= int((allMatkul.size() - 1) / 10) && allMatkul.size() > 0) page++;
+		else if (menu == "<" && page > 1) page--;
+		else if (menu == "0") return;
+		else {
+			int select;
+			stringstream temp(menu);
+			temp >> select;
+			if (select > 10 * (page - 1) && select <= 10 * page && select <= (int)allMatkul.size())
+			{
+				cout << endl << "Masukkan Nilai " << allMatkul.at(select - 1)->getName() << endl;
+				cout << "-> [A/AB/B/BC/C/D/E]: ";
+				cin >> menu;
+				if (menu == "A")
+					frs->setNilaiMatkul(allMatkul.at(select - 1)->getId(), 4.0f);
+				else if (menu == "AB")
+					frs->setNilaiMatkul(allMatkul.at(select - 1)->getId(), 3.5f);
+				else if (menu == "B")
+					frs->setNilaiMatkul(allMatkul.at(select - 1)->getId(), 3.0f);
+				else if (menu == "BC")
+					frs->setNilaiMatkul(allMatkul.at(select - 1)->getId(), 2.5f);
+				else if (menu == "C")
+					frs->setNilaiMatkul(allMatkul.at(select - 1)->getId(), 2.0f);
+				else if (menu == "D")
+					frs->setNilaiMatkul(allMatkul.at(select - 1)->getId(), 1.0f);
+				else if (menu == "E")
+					frs->setNilaiMatkul(allMatkul.at(select - 1)->getId(), 0.0f);
+				else
+					continue;
+
+				Save::saveData(&recFrs, FRSPATH);
+
+				cout << "Nilai telah diubah!" << endl;
+				cin.ignore();
+				continue;
+			}
+		}
+	}
+}
+
+// ==================================================================
+
 int main()
 {
 	Save::loadData(myData, DATAPATH);
@@ -1344,6 +1833,7 @@ int main()
 	Save::loadData(recDosen, DOSENPATH);
 	Save::loadData(recTendik, TENDIKPATH);
 	Save::loadData(recMahasiswa, MAHASISWAPATH);
+	Save::loadData(recFrs, FRSPATH);
 
 	if (recUser.size() == 0)
 	{
@@ -1390,8 +1880,7 @@ int main()
 					cin.ignore();
 					break;
 				case 3:
-					cout << "Selamat datang, Mahasiswa!\n";
-					cin.ignore();
+					mahasiswaPage(Mahasiswa::getMahasiswaById(&recMahasiswa, user->getPersonId()));
 					break;
 				default:
 					break;
