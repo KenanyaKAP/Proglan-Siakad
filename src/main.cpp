@@ -55,6 +55,10 @@ void addDosen(string deptId = "\0");
 void addTendik();
 void addMahasiswa(string deptId = "\0");
 
+void editDosen(Dosen *dosen);
+void editTendik(Tendik *tendik);
+void editMahasiswa(Mahasiswa *mahasiswa);
+
 void setNilaiMahasiswa(vector<Mahasiswa*> mahasiswas);
 void setNilaiFRS(Mahasiswa *mahasiswa);
 
@@ -350,9 +354,24 @@ void dosenPage(Dosen *dosen)
 				cout << "Setujui Semua FRS ?" << endl;
 				cout << "-> [y/n]: ";
 				cin >> menu;
+				cin.ignore();
 
 				if (menu == 'Y' || menu == 'y')
 				{
+					int sksZero = 0;
+					for (Mahasiswa &mahasiswa : recMahasiswa)
+					{
+						if (FRS::getFRSById(&recFrs, mahasiswa.getFRSId())->getTotalSKS() == 0)
+						{
+							cout << endl << "FRS " << mahasiswa.getName() << " masih kosong!" << endl;
+							cin.ignore();
+							sksZero = 1;
+							break;
+						}
+					}
+
+					if (sksZero == 1) break;
+					
 					for (string &mhsId : *dosen->getAllMahasiswaWaliId())
 					{
 						FRS::getFRSById(&recFrs, Mahasiswa::getMahasiswaById(&recMahasiswa, mhsId)->getFRSId())->setStatus(FRS::Status::Approved);
@@ -906,6 +925,7 @@ void showDosenPage(string deptId)
 				cout << Departemen::getDepartemenById(&recDepartemen, deptId)->getName();
 			cout << endl;
 			cout << "  2. Hapus Dosen ini" << endl;
+			cout << "  3. Edit Dosen ini" << endl;
 			if (index + 1 < int(dosens.size()))
 				cout << "  >. Tampilkan Selanjutnya" << endl;
 			if (index > 0)
@@ -942,6 +962,9 @@ void showDosenPage(string deptId)
 						cin.ignore();
 					}
 				}
+				break;
+			case '3':
+				editDosen(&dosen);
 				break;
 			case '>':
 				if (index + 1 < int(dosens.size())) index++;
@@ -1008,6 +1031,7 @@ void showTendikPage()
 			cout << "Menu:" << endl;
 			cout << "  1. Tambah Tendik" << endl;
 			cout << "  2. Hapus Tendik ini" << endl;
+			cout << "  3. Edit Tendik ini" << endl;
 			if (index + 1 < int(recTendik.size()))
 				cout << "  >. Tampilkan Selanjutnya" << endl;
 			if (index > 0)
@@ -1042,6 +1066,9 @@ void showTendikPage()
 						cin.ignore();
 					}
 				}
+				break;
+			case '3':
+				editTendik(&tendik);
 				break;
 			case '>':
 				if (index + 1 < int(recTendik.size())) index++;
@@ -1118,7 +1145,7 @@ void showMahasiswaPage(string deptId)
 				cout << Departemen::getDepartemenById(&recDepartemen, mahasiswa.getDepartemenId())->getName();
 			cout << endl;
 			cout << "  2. Hapus Mahasiswa ini" << endl;
-			cout << "  3. Ubah Dosen Wali" << endl;
+			cout << "  3. Edit Mahasiswa ini" << endl;
 			cout << "  4. Tampilkan FRS" << endl;
 			cout << "  5. Tampilkan Semua IPS" << endl;
 			if (index + 1 < int(mahasiswas.size()))
@@ -1161,57 +1188,7 @@ void showMahasiswaPage(string deptId)
 				}
 				break;
 			case '3':
-				{
-					int page = 1;
-					string menu;
-					vector<Dosen*> dosenDepartemen = Dosen::getDosensByDeptId(&recDosen, mahasiswa.getDepartemenId());
-					while (1)
-					{
-						Utils::clearScreen();
-						Utils::printTable(Dosen::makeTuples(&dosenDepartemen), Dosen::tuplesHeader(), page);
-
-						cout << endl;
-						cout << "Menu: " << endl;
-						cout << " 1~10. Pilih dosen wali" << endl;
-						if (page <= int((dosenDepartemen.size() - 1) / 10) && dosenDepartemen.size() > 0)
-							cout << "    >. Tampilkan Selanjutnya" << endl;
-						if (page > 1)
-							cout << "    <. Tampilkan Sebelumnya" << endl;
-						cout << "-> Pilihan: ";
-						cin >> menu;
-						cin.ignore();
-
-						if (menu == ">" && page <= int((dosenDepartemen.size() - 1) / 10) && dosenDepartemen.size() > 0) page++;
-						else if (menu == "<" && page > 1) page--;
-						else {
-							int select;
-							stringstream temp(menu);
-							temp >> select;
-							if (select > 10 * (page - 1) && select <= 10 * page && select <= (int)dosenDepartemen.size())
-							{
-								cout << endl << "Anda yakin ingin mengubah dosen wali" << endl;
-								cout << ": " << mahasiswa.getName() << endl;
-								cout << "menjadi" << endl;
-								cout << ": " << Dosen::getDosenById(&recDosen, dosenDepartemen.at(select - 1)->getId())->getName() << "?" << endl;
-								cout << "-> [y/n]: ";
-								cin >> menu;
-								cin.ignore();
-								
-								if (menu == "Y" || menu == "y")
-								{
-									Dosen::getDosenById(&recDosen, mahasiswa.getDoswalId())->delMahasiswaWaliId(mahasiswa.getId());
-									mahasiswa.setDoswalId(dosenDepartemen.at(select - 1)->getId());
-									Dosen::getDosenById(&recDosen, mahasiswa.getDoswalId())->addMahasiswaWaliId(mahasiswa.getId());
-									Save::saveData(&recMahasiswa, MAHASISWAPATH);
-									Save::saveData(&recDosen, DOSENPATH);
-									cout << endl << "Dosen Wali telah diubah!" << endl;
-									cin.ignore();
-								}
-								break;
-							}
-						}
-					}
-				}
+				editMahasiswa(&mahasiswa);
 				break;
 			case '4':
 				showFRSPage(&mahasiswa);
@@ -1715,6 +1692,269 @@ void addMahasiswa(string deptId)
 	cout << "Username: NPP" << endl;
 	cout << "Password: [ddmmyyyy] tanggal lahir" << endl;
 	cin.ignore();
+}
+
+// ==================================================================
+
+void editDosen(Dosen *dosen)
+{
+	char menu;
+
+	while (1)
+	{
+		Utils::clearScreen();
+		cout << ": Edit Dosen" << endl << endl;
+		cout << "1. Nama          : " << dosen->getName() << endl;
+		cout << "2. Tanggal Lahir : " << dosen->getTglLahir() << " " << Utils::intToStringMonth(dosen->getBulanLahir()) << " " << dosen->getTahunLahir() << endl;
+		cout << "3. Pendidikan    : S" << dosen->getPendidikan() << endl << endl;
+		cout << "Menu:" << endl;
+		cout << " 1~3. Pilih data yang ingin diubah" << endl;
+		cout << "   0. Kembali" << endl;
+		cout << "-> Pilihan: ";
+		cin >> menu;
+		cin.ignore();
+
+		switch (menu)
+		{
+		case '0':
+			return;
+		case '1':
+			{
+				string name;
+				cout << endl << "Nama baru: ";
+				getline(cin, name);
+
+				dosen->setName(name);
+				Save::saveData(&recDosen, DOSENPATH);
+
+				cout << endl << "Nama berhasil diubah!" << endl;
+				cin.ignore();
+			}
+			break;
+		case '2':
+			{
+				int dd, mm, yy;
+				cout << endl << "Tanggal Lahir : ";
+				cin >> dd;
+				cout << "Bulan Lahir   : ";
+				cin >> mm;
+				cout << "Tahun Lahir   : ";
+				cin >> yy;
+				cin.ignore();
+
+				dosen->setTglLahir(dd, mm, yy);
+				Save::saveData(&recDosen, DOSENPATH);
+
+				cout << endl << "Tanggal lahir berhasil diubah!" << endl;
+				cin.ignore();
+			}
+			break;
+		case '3':
+			{
+				int pendidikan;
+				cout << endl << "Pendidikan baru : ";
+				cin >> pendidikan;
+				cin.ignore();
+
+				dosen->setPendidikan(pendidikan);
+				Save::saveData(&recDosen, DOSENPATH);
+
+				cout << endl << "Pendidikan berhasil diubah!" << endl;
+				cin.ignore();
+			}
+			break;
+		default:
+			break;
+		}
+	}
+}
+
+// ==================================================================
+
+void editTendik(Tendik *tendik)
+{
+	char menu;
+
+	while (1)
+	{
+		Utils::clearScreen();
+		cout << ": Edit Dosen" << endl << endl;
+		cout << "1. Nama          : " << tendik->getName() << endl;
+		cout << "2. Tanggal Lahir : " << tendik->getTglLahir() << " " << Utils::intToStringMonth(tendik->getBulanLahir()) << " " << tendik->getTahunLahir() << endl;
+		cout << "3. Unit          : " << tendik->getUnit() << endl << endl;
+		cout << "Menu:" << endl;
+		cout << " 1~3. Pilih data yang ingin diubah" << endl;
+		cout << "   0. Kembali" << endl;
+		cout << "-> Pilihan: ";
+		cin >> menu;
+		cin.ignore();
+
+		switch (menu)
+		{
+		case '0':
+			return;
+		case '1':
+			{
+				string name;
+				cout << endl << "Nama baru: ";
+				getline(cin, name);
+
+				tendik->setName(name);
+				Save::saveData(&recTendik, TENDIKPATH);
+
+				cout << endl << "Nama berhasil diubah!" << endl;
+				cin.ignore();
+			}
+			break;
+		case '2':
+			{
+				int dd, mm, yy;
+				cout << endl << "Tanggal Lahir : ";
+				cin >> dd;
+				cout << "Bulan Lahir   : ";
+				cin >> mm;
+				cout << "Tahun Lahir   : ";
+				cin >> yy;
+				cin.ignore();
+
+				tendik->setTglLahir(dd, mm, yy);
+				Save::saveData(&recTendik, TENDIKPATH);
+
+				cout << endl << "Tanggal lahir berhasil diubah!" << endl;
+				cin.ignore();
+			}
+			break;
+		case '3':
+			{
+				string unit;
+				cout << endl << "Unit baru : ";
+				getline(cin, unit);
+
+				tendik->setUnit(unit);
+				Save::saveData(&recTendik, TENDIKPATH);
+
+				cout << endl << "Unit berhasil diubah!" << endl;
+				cin.ignore();
+			}
+			break;
+		default:
+			break;
+		}
+	}
+}
+
+// ==================================================================
+
+void editMahasiswa(Mahasiswa *mahasiswa)
+{
+	char menu;
+
+	while (1)
+	{
+		Utils::clearScreen();
+		cout << ": Edit Dosen" << endl << endl;
+		cout << "1. Nama          : " << mahasiswa->getName() << endl;
+		cout << "2. Tanggal Lahir : " << mahasiswa->getTglLahir() << " " << Utils::intToStringMonth(mahasiswa->getBulanLahir()) << " " << mahasiswa->getTahunLahir() << endl;
+		cout << "3. Dosen Wali    : " << Dosen::getDosenById(&recDosen, mahasiswa->getDoswalId())->getName() << endl << endl;
+		cout << "Menu:" << endl;
+		cout << " 1~3. Pilih data yang ingin diubah" << endl;
+		cout << "   0. Kembali" << endl;
+		cout << "-> Pilihan: ";
+		cin >> menu;
+		cin.ignore();
+
+		switch (menu)
+		{
+		case '0':
+			return;
+		case '1':
+			{
+				string name;
+				cout << endl << "Nama baru: ";
+				getline(cin, name);
+
+				mahasiswa->setName(name);
+				Save::saveData(&recMahasiswa, MAHASISWAPATH);
+
+				cout << endl << "Nama berhasil diubah!" << endl;
+				cin.ignore();
+			}
+			break;
+		case '2':
+			{
+				int dd, mm, yy;
+				cout << endl << "Tanggal Lahir : ";
+				cin >> dd;
+				cout << "Bulan Lahir   : ";
+				cin >> mm;
+				cout << "Tahun Lahir   : ";
+				cin >> yy;
+				cin.ignore();
+
+				mahasiswa->setTglLahir(dd, mm, yy);
+				Save::saveData(&recMahasiswa, MAHASISWAPATH);
+
+				cout << endl << "Tanggal lahir berhasil diubah!" << endl;
+				cin.ignore();
+			}
+			break;
+		case '3':
+			{
+				int page = 1;
+				string menu;
+				vector<Dosen*> dosenDepartemen = Dosen::getDosensByDeptId(&recDosen, mahasiswa->getDepartemenId());
+				while (1)
+				{
+					Utils::clearScreen();
+					Utils::printTable(Dosen::makeTuples(&dosenDepartemen), Dosen::tuplesHeader(), page);
+
+					cout << endl;
+					cout << "Menu: " << endl;
+					cout << " 1~10. Pilih dosen wali" << endl;
+					if (page <= int((dosenDepartemen.size() - 1) / 10) && dosenDepartemen.size() > 0)
+						cout << "    >. Tampilkan Selanjutnya" << endl;
+					if (page > 1)
+						cout << "    <. Tampilkan Sebelumnya" << endl;
+					cout << "-> Pilihan: ";
+					cin >> menu;
+					cin.ignore();
+
+					if (menu == ">" && page <= int((dosenDepartemen.size() - 1) / 10) && dosenDepartemen.size() > 0) page++;
+					else if (menu == "<" && page > 1) page--;
+					else {
+						int select;
+						stringstream temp(menu);
+						temp >> select;
+						if (select > 10 * (page - 1) && select <= 10 * page && select <= (int)dosenDepartemen.size())
+						{
+							cout << endl << "Anda yakin ingin mengubah dosen wali" << endl;
+							cout << ": " << mahasiswa->getName() << endl;
+							cout << "menjadi" << endl;
+							cout << ": " << Dosen::getDosenById(&recDosen, dosenDepartemen.at(select - 1)->getId())->getName() << "?" << endl;
+							cout << "-> [y/n]: ";
+							cin >> menu;
+							cin.ignore();
+							
+							if (menu == "Y" || menu == "y")
+							{
+								Dosen::getDosenById(&recDosen, mahasiswa->getDoswalId())->delMahasiswaWaliId(mahasiswa->getId());
+								mahasiswa->setDoswalId(dosenDepartemen.at(select - 1)->getId());
+								Dosen::getDosenById(&recDosen, mahasiswa->getDoswalId())->addMahasiswaWaliId(mahasiswa->getId());
+								Save::saveData(&recMahasiswa, MAHASISWAPATH);
+								Save::saveData(&recDosen, DOSENPATH);
+								cout << endl << "Dosen Wali telah diubah!" << endl;
+								cin.ignore();
+							}
+							break;
+						}
+					}
+				}
+			}
+			break;
+		default:
+			break;
+		}
+	}
 }
 
 // ==================================================================
