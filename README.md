@@ -5,6 +5,7 @@ Teknik Komputer
 5024211004
 
 # Laporan Sederhana
+- Untuk laporan lebih lengkap, terdapat pada folder [other](https://github.com/KenanyaKAP/Proglan-Siakad/tree/main/other).
 
 ## Perubahan
 - Mengubah tampilan program
