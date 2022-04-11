@@ -174,7 +174,7 @@ void adminMenuPage()
 			case '1':
 				{
 					Utils::clearScreen();
-					cout << "Awal >> Pengisian FRS >> Pelaksanaan Semester >> Ganti Semester" << endl << endl;
+					cout << "Belum Masa FRS > Pengisian FRS > Pelaksanaan Semester (Lewat Masa FRS) > Ganti Semester" << endl << endl;
 					cout << "Masa FRS : " << myData.getMasaFRSString() << endl;
 					if (myData.getMasaFRS() == Data::MasaFRS::Belum)
 						cout << "Ubah masa ke Pengisian FRS ?" << endl;

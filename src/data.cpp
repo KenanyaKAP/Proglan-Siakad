@@ -40,7 +40,7 @@ string Data::getMasaFRSString()
     case Data::MasaFRS::Belum :
         return "Belum Masa FRS";
     case Data::MasaFRS::Isi :
-        return "Pengisian";
+        return "Pengisian FRS";
     case Data::MasaFRS::Lewat :
         return "Lewat Masa FRS";
     }
