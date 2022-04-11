@@ -38,7 +38,7 @@ string User::getRoleString()
     case User::Role::Mahasiswa:
         return "Mahasiswa";
     }
-    return '\0';
+    return "\0";
 }
 
 string User::getPersonId(){ return this->personId; }

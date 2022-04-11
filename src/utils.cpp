@@ -1,6 +1,8 @@
 #include <iostream>
 #include <string>
-#include <conio.h>
+// #include <conio.h>
+#include <termios.h>
+#include <stdio.h>
 
 #include "include/utils.hpp"
 
@@ -63,6 +65,42 @@ string Utils::intToStringMonth(int monthInt)
     }
 }
 
+// ================= Getch for Linux =================
+static struct termios old, current;
+
+void initTermios(int echo) 
+{
+  tcgetattr(0, &old);
+  current = old;
+  current.c_lflag &= ~ICANON;
+  if (echo) {
+      current.c_lflag |= ECHO;
+  } else {
+      current.c_lflag &= ~ECHO;
+  }
+  tcsetattr(0, TCSANOW, &current);
+}
+
+void resetTermios(void) 
+{
+  tcsetattr(0, TCSANOW, &old);
+}
+
+char getch_(int echo) 
+{
+  char ch;
+  initTermios(echo);
+  ch = getchar();
+  resetTermios();
+  return ch;
+}
+
+char getch(void) 
+{
+  return getch_(0);
+}
+// ===================================================
+
 string Utils::takePassword()
 {
     char pass[1000];
@@ -85,7 +123,7 @@ string Utils::takePassword()
         {
             exit(0);
         }
-        else /*if((a>='a'&&a<='z') || (a>='A'&&a<='Z') || (a>='0'&&a<='9'))*/
+        else
         {
             pass[i] = a;
             ++i;
@@ -93,9 +131,6 @@ string Utils::takePassword()
         }
     }
     cout << endl;
-    return string(pass);
-
-    // string temp;
-    // cin >> temp;
-    // return temp;
+    return string(pass);    
 }
+

@@ -2,7 +2,6 @@
 #include <vector>
 #include <string>
 #include <sstream>
-#include <conio.h>
 
 #include "include/utils.hpp"
 #include "include/save.hpp"

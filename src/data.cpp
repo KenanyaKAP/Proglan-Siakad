@@ -44,7 +44,7 @@ string Data::getMasaFRSString()
     case Data::MasaFRS::Lewat :
         return "Lewat Masa FRS";
     }
-    return '\0';
+    return "\0";
 }
 
 string Data::getLastAdminId(){ return this->lastAdminId; }
