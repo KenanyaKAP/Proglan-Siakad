@@ -119,11 +119,12 @@ void adminPage(User *user)
 				Utils::clearScreen();
 				string oldPass, newPass, reNewPass;
 				cout << "Password lama:\n-> ";
-				oldPass = Utils::takePassword();
+				cin >> oldPass;
 				cout << "Password baru:\n-> ";
-				newPass = Utils::takePassword();
+				cin >> newPass;
 				cout << "Ketik ulang password baru:\n-> ";
-				reNewPass = Utils::takePassword();
+				cin >> reNewPass;
+				cin.ignore();
 
 				if (user->getPassword() == oldPass)
 				{
@@ -397,11 +398,12 @@ void dosenPage(Dosen *dosen)
 				Utils::clearScreen();
 				string oldPass, newPass, reNewPass;
 				cout << "Password lama:\n-> ";
-				oldPass = Utils::takePassword();
+				cin >> oldPass;
 				cout << "Password baru:\n-> ";
-				newPass = Utils::takePassword();
+				cin >> newPass;
 				cout << "Ketik ulang password baru:\n-> ";
-				reNewPass = Utils::takePassword();
+				cin >> reNewPass;
+				cin.ignore();
 
 				User *user = User::getUserByUname(&recUser, dosen->getNPP());
 
@@ -456,11 +458,12 @@ void mahasiswaPage(Mahasiswa *mahasiswa)
 				Utils::clearScreen();
 				string oldPass, newPass, reNewPass;
 				cout << "Password lama:\n-> ";
-				oldPass = Utils::takePassword();
+				cin >> oldPass;
 				cout << "Password baru:\n-> ";
-				newPass = Utils::takePassword();
+				cin >> newPass;
 				cout << "Ketik ulang password baru:\n-> ";
-				reNewPass = Utils::takePassword();
+				cin >> reNewPass;
+				cin.ignore();
 
 				User *user = User::getUserByUname(&recUser, mahasiswa->getNRP());
 
@@ -2151,7 +2154,7 @@ int main()
 		cout << "-> Username: ";
 		cin >> usernameInp;
 		cout << "-> Password: ";
-		passwordInp = Utils::takePassword();
+		cin >> passwordInp;
 		cin.ignore();
 		if (User *user = User::getUserByUname(&recUser, usernameInp))
 		{

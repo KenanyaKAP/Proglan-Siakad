@@ -15,7 +15,6 @@ namespace Utils {
     string encrypt(string input);
     string decrypt(string input);
     string intToStringMonth(int monthInt);
-    string takePassword();
 
     template <class... T>
     void printTable(vector<tuple<T...>> data, vector<string> header, unsigned int page);
