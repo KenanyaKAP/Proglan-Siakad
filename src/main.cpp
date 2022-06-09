@@ -223,19 +223,17 @@ void adminMenuPage()
 							bool cancel = false;
 							for (Mahasiswa &mahasiswa : recMahasiswa)
 							{
-								if (!mahasiswa.getIPS(mahasiswa.getSemester()))
+								if (!FRS::getFRSById(&recFrs, mahasiswa.getFRSId())->getIPS())
 								{
+									cout << endl << "IPS " << mahasiswa.getName() << " masih 0!" << endl;
+									cin.ignore();
 									cancel = true;
 									break;
 								}
 							}
 
 							if (cancel)
-							{
-								cout << endl << "Masih terdapat Mahasiswa dengan IPS 0!" << endl;
-								cin.ignore();
 								break;
-							}
 
 							for (Mahasiswa &mahasiswa : recMahasiswa)
 							{
